@@ -3,7 +3,7 @@
 > **Stage 3 implementation completed by the single authorized runner run (exit 0); author review gate.** Completed observe never emits `:unsupported`. Evidence is finite fixtures only: not universal parity, live integration, security or performance.
 > Stage 1, Stage 2 and Stage 3 are implemented; the full normative follower contract below is unchanged.
 > Stage 2 run limitations/approvals below are historical, not current launch authority.
-> Benchmark: parent launch review passed; one owner-authorized coding loop is the current step (see Throughput benchmark). No benchmark loop has run at this checkpoint.
+> Benchmark: the single owner-authorized coding loop completed (exit 0) and the local harness is implemented; author review gate, no further loop authorized (see Throughput benchmark).
 
 This library helps audio/video, sensor, packet and device-buffer applications
 pace units on their own timeline or learn the relationship to another clock.
@@ -34,12 +34,13 @@ They work separately or together: follower trim can steer a pacer.
 | Approved | Stage 3 parent review passed for the verified kit and the 159-record public-Go corpus. This records no normative API or test change. One Stage 3 implementation run is authorized with the exact command in the Stage 3 kit operation section: claude-haiku-5-5 for normal attempts, gpt-6.1-sol high for the second attempt and gpt-6.1-sol max for the final attempt, using MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Prior runner commit and discard permissions apply only to passing attempts and attempt-owned failures. The original $25 total is not expanded; provider caps are owner-confirmed, not independently verified, and spend is unknown. No later kits, installs, remotes or publication are authorized. |
 | Approved | Bounded dependency-free public-API throughput harness kit and verified kit commit; tool-only clock/introspection/output effects as described below. Parent review before coding loop; no expanded budget, library changes or dependencies. |
 | Approved | Parent launch review of the benchmark kit (HEAD `4867fc4d82168e230c37ea2022ca28a2b6eb0da1`, branch `kit/throughput-benchmark`) passed, including the independent-review strengthening in [benchmark verification](docs/benchmark-verification.md). One coding loop is authorized with the exact command in the Benchmark kit operation section: claude-haiku-5-5 for normal attempts, gpt-6.1-sol high for the second attempt and gpt-6.1-sol max for the final attempt, using MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Runner commit and discard permissions apply only to passing attempts and attempt-owned failures. Only `scripts/bench/runner.exs` is writable implementation. The original $25 total is not expanded; provider caps are owner-confirmed, not independently verified, and spend is unknown. No library change, dependency, installation, remote, publication or additional loop is authorized. |
+| Approved | Benchmark loop completed once with exit 0: BENCH-1 passed on the first claude-haiku-5-5 attempt (`e477f81`); BENCH-tree passed the judge with no coder attempt. No gpt-6.1-sol escalation, discard or STOP occurred. The loop changed only `scripts/bench/runner.exs` and `PROGRESS.md`. Local timed evidence is one short machine run, not a speed claim; spend is unknown. The loop is not authorized again. |
 | Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
 | Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and broader benchmarks; decide before the affected stage. No task may assume them. |
 
-**Current gate: benchmark coding loop authorized after parent launch review (single run; not yet run at this checkpoint).**
-See [Stage 3 verification](docs/stage3-verification.md) and operation commands at
-end of this README. The original total $25 constraint is unchanged; provider caps
+**Current gate: author review of the completed throughput benchmark implementation (single loop run; no further loop authorized).**
+See [benchmark verification](docs/benchmark-verification.md) and the Throughput benchmark section;
+[Stage 3 verification](docs/stage3-verification.md) remains the historical Stage 3 record. The original total $25 constraint is unchanged; provider caps
 are owner-confirmed, not independently verified, and spend/remaining are unknown.
 
 The following temporary boundary is historical Stage 2 provenance only. Stage 3
@@ -873,7 +874,7 @@ spend/remaining unknown. Attempt/time limits do not enforce dollars. No preparat
 model calls, remotes, installs, publication or later kits. Runtime matrix/release
 and adapters remain deferred until separately reviewed.
 
-## Throughput benchmark (approved bounded tool; parent launch review passed, one loop authorized)
+## Throughput benchmark (approved bounded tool; implemented by the single authorized loop)
 
 This dependency-free developer harness measures this Elixir implementation, not
 Go speed or real-time scheduling. It is separate from the pure runtime library.
@@ -882,7 +883,7 @@ installs, dependencies, network, secrets, global VM tuning or concurrency produc
 CLI spelling, bounded defaults and report definitions below are local design
 choices within that approval. Wider benchmarking/publication remains deferred.
 
-Promised commands after BENCH-1 implementation (not results from delivered stubs):
+Public commands (implemented in BENCH-1; local evidence is limited to the runs described below):
 
 ```sh
 mix run scripts/throughput.exs --smoke
@@ -963,7 +964,7 @@ write ignored build caches/start VM processes as usual. The harness itself does
 not write results, spawn workload processes, read environment/secrets, contact
 network, sleep or tune VM globals. No permanent results/artifact format is added.
 
-### Benchmark kit operation — parent review passed; one authorized loop
+### Benchmark kit operation — loop completed once; not authorized again
 
 Prepared directly on `kit/throughput-benchmark` over actual clean Stage 3 HEAD
 `03a99baca1db2872f6e6f9298914aab9e2242a2a`; no archive to apply. Existing `.loop/`
@@ -987,8 +988,8 @@ bash scripts/loop.sh --check
 ```
 
 `--check` makes no model calls. Verified evidence and protection inventory:
-[benchmark kit verification](docs/benchmark-verification.md). Parent launch review
-passed; the following single implementation loop is authorized and is the only loop permitted:
+[benchmark kit verification](docs/benchmark-verification.md). The following single
+implementation loop was run once (exit 0) and is not authorized again:
 
 ```sh
 MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \
@@ -997,6 +998,31 @@ STRONG_CMD='pi --provider openai-codex --model gpt-6.1-sol --thinking high --pri
 STRONGEST_CMD='pi --provider openai-codex --model gpt-6.1-sol --thinking max --print --no-session' \
 bash scripts/loop.sh
 ```
+
+**Loop result (completed once, exit 0; output in ignored `.loop/bench.run.out`, exit code in
+`.loop/bench.exit`):** BENCH-1 passed on attempt 1 with `claude-haiku-5-5` and commit `e477f81`
+(`Coder-Command:` trailer present). BENCH-tree then passed the judge without a coder attempt, and
+`every task passes` ended the run. The loop changed only `scripts/bench/runner.exs` and
+`PROGRESS.md`; library, tests, fixtures, READMEs, SPEC and configuration were protected and unchanged.
+Acceptance at the final docs commit: format (including scripts), warnings-as-errors compile, 72 tests,
+unchanged `--check` (8/8) and the public smoke (18 rows). Model spend is unknown; provider caps
+are owner-confirmed and not independently verified.
+
+**Public run commands (no model calls):**
+
+```sh
+mix run scripts/throughput.exs --smoke
+MIX_ENV=prod mix run scripts/throughput.exs
+mix run scripts/throughput.exs --iterations 1000 --samples 3 --warmup 100
+```
+
+**Local timed evidence limits:** the default run completed in about one second on one machine
+(Elixir 1.20.4, OTP 29, aarch64 macOS, 10 schedulers) with 27 rows. Those numbers are not
+versioned, not a speed claim, not a Go comparison, not an allocation or real-time measurement and
+not a statistical confidence interval. Process memory deltas are self-process net changes and may be
+negative. VM GC counts and reclaimed words are VM-wide counters that include unrelated work; reclaimed
+words are not allocation volume. The timer also includes the in-execute initial cursor read and loop
+accounting.
 
 Runner commits passing attempts on the nonmain branch and discards only
 attempt-owned failures; prompts/logs/diffs/notes under `.loop/`, exhausted task

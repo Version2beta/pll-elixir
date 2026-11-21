@@ -1,4 +1,8 @@
-# Benchmark overlay kit verification — preparation only
+# Benchmark kit verification and implementation evidence
+
+Historical sections below record kit preparation and private-reference feasibility before the
+coder loop. The current implementation evidence is the final section, "Implementation loop
+result"; it supersedes the preparation-only status and the "not yet run" launch checkpoint.
 
 Baseline: actual clean owner Stage 3 checkout
 03a99baca1db2872f6e6f9298914aab9e2242a2a on kit/stage3-follower-parity.
@@ -70,14 +74,14 @@ validate only positive units; restore default lock threshold 100000. Unmodified
 reference passes 6/6. No model/coder calls; owner implementation remains stubbed.
 Unchanged runner and full decoded grep-ERE protection inventory rechecked.
 
-## Parent launch gate (passed; one loop authorized, not yet run)
+## Parent launch gate (passed; the one loop has since completed)
 
 Parent launch review of the kit at 4867fc4d82168e230c37ea2022ca28a2b6eb0da1 passed.
 The independent-review strengthening above is part of the reviewed kit. The owner
 authorized one coding loop with the README command only (Haiku normal; gpt-6.1-sol
 high second attempt; gpt-6.1-sol max final; MAX_ITER=12, MAX_ATTEMPTS=3,
 ITER_SECONDS=1200, JUDGE_TIMEOUT=300). Only scripts/bench/runner.exs is coder work.
-This checkpoint predates the loop: no coder/model calls, benchmark run or result exist yet.
+This checkpoint predates the loop; the loop result is recorded in the final section.
 
 ## Limitations and next gate
 
@@ -94,3 +98,36 @@ results format is added. Reference code must not be exposed to coder. Parent lau
 passed; a single owner-authorized loop is permitted. Original aggregate $25 unchanged; provider
 caps owner-confirmed, not verified; spend and remaining amount unknown. No extra
 models/fanout, installs, remotes, sibling writes, library refactors or publication.
+
+## Implementation loop result (current)
+
+Historical kit feasibility above (private reference, stub failures, parent launch review) is
+separate from the completed implementation below. The implementation is the runner's single
+coder attempt, not the private reference.
+
+* Loop: `MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300` with the README
+  commands, run once from kit/throughput-benchmark after the pre-launch docs gate `e8e5068`.
+  Exit 0 after `every task passes`. Output: ignored `.loop/bench.run.out`; exit code
+  `.loop/bench.exit`. No STOP, no discard, no escalation.
+* Commits: `e477f81` (BENCH-1 attempt 1, `claude-haiku-5-5`, `Coder-Command:` trailer).
+  BENCH-tree had no coder attempt and passed the judge. One coder call; spend unknown.
+* Changed by the loop: `scripts/bench/runner.exs` and `PROGRESS.md` only. Library, tests,
+  fixtures, configuration, READMEs and SPEC were not changed by the loop.
+* Implementation review: nine chained public workloads through `prepare/2`, `execute/3`
+  and `validate!/3`; warmup and setup outside timing; elapsed measured only around
+  `execute/3`; the final state remains live through the second clock and is dropped from the
+  report; exact calls/units/statuses are validated after timing and mismatches raise.
+  Snapshots record self-process memory and VM-wide GC counters only.
+* Acceptance at the final docs commit: `mix format --check-formatted` and the same
+  command for `scripts/bench/*.exs scripts/throughput.exs`, `MIX_ENV=test mix compile
+  --warnings-as-errors`, `mix test --seed 0` (72 passed), `bash scripts/loop.sh --check`
+  (8/8 pass), and `mix run scripts/throughput.exs --smoke` (18 rows, exit 0).
+* Local default baseline: `MIX_ENV=prod mix run scripts/throughput.exs` completed in about
+  one second with 27 rows (nine workloads, three samples). Output is ignored
+  `.loop/bench.baseline.out`; it is machine-specific and not versioned.
+* Limits: one machine, short runs, three samples. No speed claim, Go comparison, allocation
+  measurement, real-time claim or confidence interval. Process memory deltas are
+  self-process net changes (can be negative). VM GC counts and reclaimed words are VM-wide.
+  Reclaimed words are not allocation volume. Timing includes loop, accounting and sink
+  overhead, and one initial cursor read inside `execute/3`. Batch units (slots/readings/tuples)
+  are not call latency. No runtime matrix, publication or adapter claim.

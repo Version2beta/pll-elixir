@@ -191,3 +191,13 @@ had not started at this checkpoint.
 BENCH-1: implemented the public-API throughput runner in scripts/bench/runner.exs only: nine chained PLL workloads, exact count/status validation, fake-clock sample arithmetic with memory/VM-GC deltas, and the sequential main header/sample output; exported names, signatures and doc comments preserved.
 BENCH-1 evidence: mix format --check-formatted (including scripts/bench/*.exs and scripts/throughput.exs) passed; MIX_ENV=test mix compile --warnings-as-errors passed; task command 6/6 passed (seed 0 and 12345); mix test test/pll --seed 0 66/66; mix test --seed 0 72/72; mix run scripts/throughput.exs --smoke exit 0 with 18 sample rows across all nine workloads; bad option exit 2. Issuance units use observed Pacer.next_due cursor deltas because Span fields are private; no protected file, dependency or private/outside reference was read or changed.
 BENCH-1 remaining/blocker: none for this task; not committed or marked done, loop.sh --check not run, and the runner alone judges and commits. Timing values are local finite-run evidence only, with no thresholds or speed claims.
+
+# Benchmark loop result (current; author review gate, no further loop)
+The single owner-authorized runner run exited 0 after `every task passes` (raw output and exit
+code in ignored .loop/bench.run.out and .loop/bench.exit). BENCH-1 passed on attempt 1 with
+claude-haiku-5-5 at e477f81 (Coder-Command trailer present); BENCH-tree passed the judge with
+no coder attempt. No gpt-6.1-sol escalation, discard or STOP. The run changed only
+scripts/bench/runner.exs and PROGRESS.md; library, tests, fixtures, READMEs, SPEC, config and
+complete seams are unchanged. Spend unknown; one coder call. No further loop is authorized.
+Coder notes (BENCH-1 attempt 1): Issuance units use observed Pacer.next_due cursor deltas
+because Span fields are private. Timing values are local finite-run evidence only.
