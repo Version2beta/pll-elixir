@@ -4,10 +4,10 @@ Authority: root README Local real-time pacing demonstration, approved scope A,
 and Pacing kit operation. Overlay baseline actual HEAD
 cd35fec92eb4632b1efc52468a024eb5bacec497, branch kit/local-pacing-demo.
 Existing README/progress design draft preserved and approval accurately recorded.
-No coder launch, network trial, installation, dependency fetch, remote or publication.
+Preparation checkpoint had no coder launch, network trial, installation, dependency fetch, remote or publication.
 Original $25 aggregate unchanged; provider caps owner-confirmed, unverified;
-spend/remaining unknown. Review before coding; live 18-trial comparison reserved
-for actual implementation, not this feasibility work.
+spend/remaining unknown. Parent launch review passed at 739c03e; see Launch gate below.
+The preparation sections below are historical checkpoint evidence.
 
 ## Delivered files and seams
 
@@ -110,3 +110,61 @@ reserved for actual implementation after launch review.
 Separate out-of-scope note: the existing benchmark parser still uses the same
 `^...$` numeric-anchor pattern. It was not changed by this pacing fix; assess its
 own trailing-newline handling separately rather than widening this patch.
+
+## Launch gate: parent review passed; authorized loop and bounded trials
+
+Parent launch review of `kit/local-pacing-demo` at `739c03e6094e897129fad94fd2ec97122157a918`
+passed: static review found no P1, and the narrow canonical-integer parser fix was verified
+(external reference 83/83 with all nine judge tasks; delivered stubs prior 72 pass, whole tree
+74/83 with both PACING tasks failing). This gate records authorization only: no normative API,
+SPEC, test, fixture or library change.
+
+Authorized, in order:
+
+1. One coder loop with the README command (`claude-haiku-5-5` normal attempts,
+   `gpt-6.1-sol` high for attempt 2, `gpt-6.1-sol max` for attempt 3; `MAX_ITER=12`,
+   `MAX_ATTEMPTS=3`, `ITER_SECONDS=1200`, `JUDGE_TIMEOUT=300`). Only `scripts/pacing/runner.exs`
+   and appended `PROGRESS.md` lines are coder work. Runner commits and discards are limited to
+   passing attempts and attempt-owned failures. Contract gaps stop the loop for review; no
+   speculative retries. Provider availability, auth or provider errors stop and are reported.
+2. After the loop's judge and final checks pass, 18 bounded local trials per the scope A
+   contract (below). No other loop, kit or model call.
+
+Budget and spend: the original $25 aggregate is not expanded; provider caps are owner-confirmed,
+not independently verified and not runner-enforced; spend and remaining funds are unknown.
+
+### Trial protocol (scope A, local, same machine)
+
+- Target fixed at 19,392,658 bps, 188-byte units, 5 seconds, discard or UDP loopback
+  with grouping 1 or 7. Three repetitions per language, 18 trials, 90 requested seconds.
+- Order: pair index k = 3*(rep-1)+config (configs ordered discard, loopback 1, loopback 7).
+  Elixir runs first when k is even; Go runs first when k is odd. Trials are strictly sequential.
+- Elixir: after `MIX_ENV=prod mix compile`, run
+  `MIX_ENV=prod mix run scripts/pacing.exs --bps 19392658 --unit-bytes 188 --seconds 5`
+  with `--udp loopback --per-datagram 1|7` where applicable, each under `timeout 12`.
+- Go: build once offline into a temporary path outside the sibling, using
+  `GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local GOWORK=off go build -mod=readonly` from a read-only
+  sibling checkout at `../pll` (`971282632129110794c9d6edd22026e9de2359be`). Each trial runs that
+  executable as `-bps 19392658 -unit-bytes 188 -seconds 5` with `-udp loopback -per-datagram 1|7`
+  where applicable, each under `timeout 12`. The executable avoids per-trial `go run` startup.
+  No Go source, `go.mod` or `go.sum` changes are allowed in the sibling.
+- Stop, with no retries or search: execution errors, socket errors, guard/cap/cancel stops,
+  nonzero exit, external timeout, or a failed preparation step. Completed trials whose
+  timing or bitrate verdict fails are recorded honestly and do not stop the matrix. No threshold
+  tuning and no rate escalation.
+- Raw stdout/stderr, exit codes, commands, start/end time, platform, OTP/Elixir/Go versions,
+  schedulers, kit and sibling Git refs with dirty state are saved under the ignored
+  `.loop/pacing-comparison/` only. Nothing versioned records machine-specific artifacts.
+
+Criteria per completed trial (both languages):
+
+- nonempty (offered > 0), accepted bytes exactly 188 * offered, no error, cap, cancel or guard stop;
+- final backlog <= 5 ms and oldest-unit p99 <= 5 ms;
+- writer payload Mbps within 1% of 19.392658. Elixir reports raw elapsed ns. Go prints
+  elapsed only to milliseconds, so the Go 1% check uses exact printed byte counts with the
+  printed elapsed; this precision limit is recorded, not papered over.
+
+Go's normal run exits 0 without a pass verdict; the criteria above are computed by the
+operator from its raw summary. Lateness is oldest unit per wake-up, not per-packet interarrival.
+Accepted-send counts are send acceptance, not receiver receipt; the receiver discards data and
+no loss, jitter, wire bitrate, header overhead, TS validity or device guarantee follows.

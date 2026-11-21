@@ -43,7 +43,7 @@ clock and exact rational count, process owner/error/guard/cleanup without networ
 or deliberate waits. Reference feasibility is not live actual implementation
 acceptance. Prior72 tests unchanged. PACING-runner and PACING-tree must fail
 unfinished runner; whole tree has83 tests. No UDP in runner judge; full18 trials
-reserved for actual implementation after review, not automated kit tests.
+are run only after the authorized loop passes, never in automated kit tests.
 
 Runtime monitors worker and links receiver to worker; on cleanup unlinks/stops
 and observes receiver termination. Guard kills and observes worker termination;
@@ -54,7 +54,8 @@ Do not claim hard real-time cancellation or receipt. Report sustained is timing-
 demonstration_pass also checks accounting/bitrate. CLI exit0 means deadline
 completion, not a passing trial; operators must inspect demonstration_pass.
 Only local loopback effects as approved. No ticker/search/remote/payload products.
-Contract gaps block affected work for review. No launch at preparation checkpoint.
+Contract gaps block affected work for review. Parent launch review passed at 739c03e;
+the single coder loop and bounded live trials are authorized per README and docs/pacing-verification.md.
 
 ---
 

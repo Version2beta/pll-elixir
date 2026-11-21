@@ -248,3 +248,10 @@ CLI deadline exit0 not a pass verdict. Benchmark parser same anchor pattern rema
 out of scope, unchanged. No implementation/runtime/runner/library/benchmark changes,
 no live UDP/model/coder call. Approved18trials intact, reserved for implementation.
 Stop for parent launch review; original budget/caps constraints unchanged.
+
+# Pacing launch gate (parent review passed; authorized loop and bounded trials)
+Parent launch review of kit/local-pacing-demo at 739c03e passed (static review: no P1; narrow
+newline parser fix verified). Docs now record exactly one coder loop with the README command and,
+after its judge passes, the bounded 18-trial local comparison in docs/pacing-verification.md.
+This gate changes no normative API, SPEC, test or runner contract. Original $25 total unchanged;
+caps owner-confirmed, not verified; spend unknown. No further loop or model call beyond runner attempts.

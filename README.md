@@ -4,6 +4,7 @@
 > Stage 1, Stage 2 and Stage 3 are implemented; the full normative follower contract below is unchanged.
 > Stage 2 run limitations/approvals below are historical, not current launch authority.
 > Benchmark: the single owner-authorized coding loop completed (exit 0) and the local harness is implemented; author review gate, no further loop authorized (see Throughput benchmark).
+> Pacing demonstration: parent launch review passed at `739c03e`. One coder loop and the bounded local trials are authorized under [Pacing kit operation](#pacing-kit-operation--parent-launch-review-passed-loop-authorized-once); no other loop, kit or model call is authorized.
 
 This library helps audio/video, sensor, packet and device-buffer applications
 pace units on their own timeline or learn the relationship to another clock.
@@ -35,12 +36,13 @@ They work separately or together: follower trim can steer a pacer.
 | Approved | Bounded dependency-free public-API throughput harness kit and verified kit commit; tool-only clock/introspection/output effects as described below. Parent review before coding loop; no expanded budget, library changes or dependencies. |
 | Approved | Parent launch review of the benchmark kit (HEAD `4867fc4d82168e230c37ea2022ca28a2b6eb0da1`, branch `kit/throughput-benchmark`) passed, including the independent-review strengthening in [benchmark verification](docs/benchmark-verification.md). One coding loop is authorized with the exact command in the Benchmark kit operation section: claude-haiku-5-5 for normal attempts, gpt-6.1-sol high for the second attempt and gpt-6.1-sol max for the final attempt, using MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Runner commit and discard permissions apply only to passing attempts and attempt-owned failures. Only `scripts/bench/runner.exs` is writable implementation. The original $25 total is not expanded; provider caps are owner-confirmed, not independently verified, and spend is unknown. No library change, dependency, installation, remote, publication or additional loop is authorized. |
 | Approved | Benchmark loop completed once with exit 0: BENCH-1 passed on the first claude-haiku-5-5 attempt (`e477f81`); BENCH-tree passed the judge with no coder attempt. No gpt-6.1-sol escalation, discard or STOP occurred. The loop changed only `scripts/bench/runner.exs` and `PROGRESS.md`. Local timed evidence is one short machine run, not a speed claim; spend is unknown. The loop is not authorized again. |
-| Approved | Local real-time pacer demonstration and bounded local trials under the [contract](#local-real-time-pacing-demonstration--approved-scope-a). Kit preparation/verified kit commit authorized; stop for parent review before coder launch. |
+| Approved | Local real-time pacer demonstration and bounded local trials under the [contract](#local-real-time-pacing-demonstration--approved-scope-a). Kit preparation and verified kit commit (`739c03e`) are complete; parent launch review passed. The single coder loop and the bounded local trials are authorized, as stated in Pacing kit operation. |
 | Approved | Scope A: bounded pacer demonstration parity, not full `pllpace` flag parity. Ticker/find-max/remote destinations/arbitrary payloads excluded; receipt/loss guarantees excluded. The three configurations, three repetitions per language and thresholds below are approved local trials, reserved until actual implementation. |
+| Approved | Parent launch review of the pacing kit (branch `kit/local-pacing-demo`, HEAD `739c03e6094e897129fad94fd2ec97122157a918`) passed: static review found no P1, and the narrow newline parser fix was verified. Authorized: one coder loop with the exact command in Pacing kit operation (claude-haiku-5-5 normal attempts, gpt-6.1-sol high second attempt, gpt-6.1-sol max last attempt; MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200, JUDGE_TIMEOUT=300), then the 18 bounded local trials in the pacing verification launch gate. Runner commit and discard permissions apply only to passing attempts and attempt-owned failures; only `scripts/pacing/runner.exs` is coder work. The original $25 total is not expanded; provider caps are owner-confirmed, not independently verified; spend is unknown. No ticker, find-max, remote UDP, receipt guarantee, library change, dependency or installation is authorized. |
 | Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
 | Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and broader benchmarks; decide before the affected stage. No task may assume them. |
 
-**Current gate: parent review of the verified local pacing kit; no coder launch authorized yet.**
+**Current gate: pacing parent launch review passed; one coder loop and the bounded local trials are authorized (see Pacing kit operation and [pacing verification](docs/pacing-verification.md)).**
 The completed throughput benchmark remains at its author review gate (single loop run).
 See [benchmark verification](docs/benchmark-verification.md) and the Throughput benchmark section;
 [Stage 3 verification](docs/stage3-verification.md) remains the historical Stage 3 record. The original total $25 constraint is unchanged; provider caps
@@ -1044,8 +1046,8 @@ from the existing throughput microbenchmark. It does not change the library,
 its no-I/O contract, the corpus, tests, runner or historical logs. The initial
 port's CLI exclusion is narrowed only for this isolated tool. Scope A, its exact
 effects/bounds and local comparative trials below are approved. Kit preparation
-and verified kit commit only at this checkpoint; parent review before coding.
-No paid call or live UDP trial is performed during preparation. Original aggregate $25 budget unchanged; spend/remaining unknown,
+and verified kit commit are complete; parent launch review passed. The coder loop
+and bounded live trials are authorized as stated in Pacing kit operation. Original aggregate $25 budget unchanged; spend/remaining unknown,
 provider caps owner-confirmed, not independently verified.
 
 ### Source basis and parity boundary
@@ -1240,12 +1242,12 @@ coarse-wait/batch design, not 77.6 microsecond wakeups or demonstrated ATSC paci
 At roughly 2 ms a batch is about 26 units; actual writer/lateness/backlog viability
 remains unproven until implementation and authorized live local trials.
 
-**Current gate:** scope A is approved. Review the verified kit before coder launch;
-choice B remains excluded. The full live comparison is reserved for the actual
-implementation, not a reference result. No coder launch follows automatically.
+**Current gate:** scope A is approved and the parent launch review passed. The single
+coder loop runs first; choice B remains excluded. The full live comparison runs only after
+that loop passes its judge and final checks, and is not a reference result.
 
 
-### Pacing kit operation — prepared, parent review before launch
+### Pacing kit operation — parent launch review passed; loop authorized once
 
 Prepared on `kit/local-pacing-demo` over actual completed library/benchmark HEAD
 `cd35fec92eb4632b1efc52468a024eb5bacec497`, preserving existing README/progress drafts.
@@ -1270,7 +1272,7 @@ mix test --seed 0
 bash scripts/loop.sh --check
 ```
 
-The exact future launch command, **withheld pending parent review**, is:
+The authorized single launch command is:
 
 ```sh
 MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \
@@ -1288,5 +1290,6 @@ progress notes do not stop retries automatically. Private helper organization
 inside runner.exs is local freedom, not new files/features/effects. No sibling
 reads by coder, deps, tuning, remotes, publication or extra model calls. Original
 $25 aggregate unchanged; caps owner-confirmed, unverified; spend/remaining unknown.
-Attempt/time caps are not dollar enforcement. Return for review after this kit;
-never chain another kit or automatically run the approved live trials.
+Attempt/time caps are not dollar enforcement. After the loop passes its judge and final
+checks, run only the bounded live trials recorded in [pacing verification](docs/pacing-verification.md#launch-gate-parent-review-passed-authorized-loop-and-bounded-trials);
+never chain another kit, loop or model call.
