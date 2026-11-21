@@ -8,15 +8,11 @@ defmodule PLL.PacerCore do
   @imin -9_223_372_036_854_775_808
   @imax 9_223_372_036_854_775_807
   @trim_limit 1_000_000_000_000
-  @nano 1_000_000_000
 
   @doc "Initialize a valid reduced Rate at slot/time/trim zero; wrong kind raises ArgumentError."
   @spec new(PLL.Rate.t()) :: {:ok, PLL.Pacer.t()} | {:error, PLL.Error.t()}
   def new(%PLL.Rate{num: num, den: den} = rate) when num > 0 and den > 0 do
-    # Period in ns is den * 10^9 / num; reduce so pn/pd is an exact period.
-    pn = den * @nano
-    g = Integer.gcd(pn, num)
-    segment = %PLL.Segment{start: 0, anchor: 0, trim: 0, pn: div(pn, g), pd: div(num, g)}
+    segment = SegmentCore.new(num, den, 0, 0, 0)
     {:ok, %PLL.Pacer{rate: rate, cursor: 0, segment: segment}}
   end
 
@@ -104,13 +100,24 @@ defmodule PLL.PacerCore do
       cond do
         abs(value) >= @trim_limit -> error(:invalid_argument)
         value == trim -> {:ok, pacer}
-        # Nonzero trim transitions are not implemented yet (Stage 1 task T3).
-        true -> error(:invalid_argument)
+        true -> retrim(pacer, value)
       end
     end
   end
 
   def set_trim(_pacer, _ppt), do: not_pacer!()
+
+  # New segment starts at the cursor, anchored at the floor of the old timing there.
+  defp retrim(%PLL.Pacer{rate: %PLL.Rate{num: num, den: den}} = pacer, value) do
+    %PLL.Pacer{cursor: cursor, segment: segment} = pacer
+    anchor = SegmentCore.floor_time(segment, cursor)
+
+    if anchor > @imax do
+      error(:overflow)
+    else
+      {:ok, %{pacer | segment: SegmentCore.new(num, den, cursor, anchor, value)}}
+    end
+  end
 
   @doc "Current integer ppt; wrong state kind raises ArgumentError."
   @spec trim(PLL.Pacer.t()) :: integer()
