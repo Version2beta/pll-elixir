@@ -48,7 +48,11 @@ reserved for actual implementation after review, not automated kit tests.
 Runtime monitors worker and links receiver to worker; on cleanup unlinks/stops
 and observes receiver termination. Guard kills and observes worker termination;
 linked receiver termination/resource release remains subject to VM/OS scheduling.
-Ctrl-C may prevent output. Do not claim hard real-time cancellation or receipt.
+Cancellation messages are an internal injected/test seam, not an operator API;
+the production coordinator only kills on guard expiry. Ctrl-C may prevent output.
+Do not claim hard real-time cancellation or receipt. Report sustained is timing-only;
+demonstration_pass also checks accounting/bitrate. CLI exit0 means deadline
+completion, not a passing trial; operators must inspect demonstration_pass.
 Only local loopback effects as approved. No ticker/search/remote/payload products.
 Contract gaps block affected work for review. No launch at preparation checkpoint.
 

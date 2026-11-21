@@ -79,3 +79,34 @@ Mix compile; prior72; full83; stub/reference unchanged-runner --check; public
 low-rate discard CLI; decoded protection ERE inventory; runner cmp/mechanics;
 git diff --check. No source, test or runner file from earlier stages changed.
 No permanent output format beyond approved stdout maps and no live trial results.
+
+## Prelaunch review follow-up — canonical integer boundary
+
+Reviewer reported no P0/P1 blockers and identified a P2 trailing-newline parser
+crash. Parent authorized the narrow protected-file fix. Pacing numeric regex now
+uses absolute `\A...\z` anchors, enforcing the existing canonical decimal promise.
+The existing parser test includes `["--bps", "5\n"]` and verifies tagged rejection
+before Runtime dispatch; test counts remain11/83. Reverting only the anchors in
+the external reference makes that regression fail with ArgumentError, proving it
+catches the original crash. Restored patched file then checked again.
+
+Patched current kit copied to a fresh temporary checkout over the actual library
+and benchmark: external reference83/83 and all9 unchanged-runner judge tasks pass;
+stubs retain prior72/72 and whole-tree74/83, with both new tasks failing as intended.
+Explicit format checks, warnings-as-errors compile, decoded protection inventory
+(54 required paths), runner byte comparison and git diff --check pass. tasks.json,
+runner, runtime, entrypoint, unfinished implementation and earlier suites unchanged.
+The CLI newline case itself exits2, stdout empty, stderr `pacing: invalid options`;
+no runtime dispatch or sockets. No live UDP, pacing trial, coder or model call.
+The original26/26 mechanics evidence above is historical; not rerun for this fix.
+
+Documentation clarification only: cooperative cancellation is internal/test-only,
+not operator-exposed; production coordinator uses guard kill. Ctrl-C does not
+guarantee a report. `sustained` is timing-only; `demonstration_pass` also checks
+accounting and bitrate, and CLI exit0 merely means deadline completion. Operators
+must inspect/retain every trial verdict. Full approved18-trial comparison remains
+reserved for actual implementation after launch review.
+
+Separate out-of-scope note: the existing benchmark parser still uses the same
+`^...$` numeric-anchor pattern. It was not changed by this pacing fix; assess its
+own trailing-newline handling separately rather than widening this patch.

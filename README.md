@@ -1172,7 +1172,9 @@ backlog. Normal deadline stops new calls, finishes current batch and flushes
 partial grouping; include final write in elapsed and backlog as Go does.
 
 Coordinator monitors worker/receiver, imposes duration+2 seconds runtime guard
-(excluding Mix startup), and cancels/kills owned processes if they do not stop.
+(excluding Mix startup), and kills the worker if it does not stop. Cooperative
+cancellation is an internal injected/test seam, not an operator-exposed command
+or signal API; the production coordinator does not send cancellation messages.
 Worker owns sender socket; receiver owns read socket. Normal/error paths close
 resources and terminate receiver; process death must release owned sockets and
 pending timers. Cancellation aborts buffered output, reports incomplete/nonzero,
@@ -1189,6 +1191,10 @@ count and median/p99/max ns with Go's quantile rule; distinguish effective datag
 grouping and send-call count from Due-call count. Print roughly once/second like
 Go, inside timing. Go lacks a send-call metric, so do not claim identical output.
 Report completed/deadline/error/cancel/cap/guard stop reason and timing verdict.
+`sustained` is timing-only (nonempty deadline completion, backlog and p99 bounds);
+`demonstration_pass` additionally checks accepted-byte accounting and bitrate.
+The CLI exits 0 on deadline completion, not on a passing demonstration verdict;
+operators must inspect `demonstration_pass` and record every failed trial.
 Slot zero is due immediately: short runs can appear fast by up to about one unit;
 no start-slot subtraction or forced unit-count equality across runtimes. Backlog
 is cursor lag, not queue depth. Lateness is oldest scheduled unit at call entry,

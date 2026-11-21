@@ -21,7 +21,7 @@ defmodule PLLPacing.Contract do
           :loopback
 
         key != nil and key != :udp and is_binary(value) and byte_size(value) <= 9 and
-            Regex.match?(~r/^[1-9][0-9]*$/, value) ->
+            Regex.match?(~r/\A[1-9][0-9]*\z/, value) ->
           String.to_integer(value)
 
         true ->

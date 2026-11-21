@@ -43,6 +43,7 @@ defmodule PLLPacing.RunnerTest do
 
     for args <- [
           ["--bps", "0"],
+          ["--bps", "5\n"],
           ["--bps", "100000001"],
           ["--unit-bytes", "65508"],
           ["--seconds", "11"],
@@ -61,6 +62,13 @@ defmodule PLLPacing.RunnerTest do
         ] do
       assert {:error, :options} = Contract.parse(args), inspect(args)
     end
+
+    result =
+      with {:ok, cfg} <- Contract.parse(["--bps", "5\n"]) do
+        Runtime.execute(cfg, fn _, _ -> flunk("invalid input reached effects") end)
+      end
+
+    assert result == {:error, :options}
 
     for cfg <- [
           config(%{seconds: :bad}),

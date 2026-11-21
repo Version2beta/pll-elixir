@@ -234,3 +234,17 @@ Historical .loop preserved: judge checks run in temporary checkouts only. No cod
 model call, install/fetch, remote/publication or Go modification. Original$25
 unchanged, caps owner-confirmed/unverified, spend unknown. Kit commit authorized;
 parent review required before coder launch; actual live trials reserved until then.
+
+# Pacing prelaunch review follow-up — verified narrow fix, no launch
+Parent authorized pacing parser canonical-integer fix: absolute regex anchors
+reject --bps value "5\n" as {:error,:options}, with regression before effects.
+Existing11 tests retained (83total). External reference83/83 and all9 judge tasks
+pass; stubs prior72pass, whole74/83 and both PACING tasks fail as intended. Reverting
+anchors makes regression raise ArgumentError; actual invalid CLI exits2 with empty
+stdout and expected stderr. Format/compile/protection54/runner-cmp/diff checks pass.
+README/SPEC clarify cancellation is internal/test-only, production guard kills,
+Ctrl-C report unguaranteed; sustained timing-only, demonstration_pass adds bitrate,
+CLI deadline exit0 not a pass verdict. Benchmark parser same anchor pattern remains
+out of scope, unchanged. No implementation/runtime/runner/library/benchmark changes,
+no live UDP/model/coder call. Approved18trials intact, reserved for implementation.
+Stop for parent launch review; original budget/caps constraints unchanged.
