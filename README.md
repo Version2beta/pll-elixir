@@ -1,9 +1,10 @@
 # pll-elixir — exact pacing and clock following
 
-> **Approved design; Stage 1 implemented; Stage 2 verified kit preparation.**
-> Stage 2 delivers failing follower stubs, not an implemented follower. The
-> window/outlier boundary below is temporary until Stage 3. Current gate:
-> parent/author review of the kit, **not coder launch**.
+> **Approved design; Stage 1 implemented; Stage 2 kit parent-reviewed; Stage 2 implementation run authorized.**
+> Until the authorized run commits passing attempts, the checked-in Stage 2 follower
+> is failing stubs, not an implemented follower. The window/outlier boundary below
+> is temporary until Stage 3. Current gate: the authorized bounded Stage 2 run
+> (exact command in the Stage 2 kit operation section); no Stage 3 or later kit is authorized.
 
 This library helps audio/video, sensor, packet and device-buffer applications
 pace units on their own timeline or learn the relationship to another clock.
@@ -25,18 +26,20 @@ They work separately or together: follower trim can steer a pacer.
 | Approved | Initialize Git on a non-main branch and commit the verified Stage 1 kit, preserving existing work. Later runner commits of passing attempts and discards of only attempt-owned failed changes are authorized; no remotes, installs or publication; later kits require separate approval. |
 | Approved | Stage 1 implementation loop authorized: Haiku-5.5 for normal first attempts; gpt-6.1-sol high for the second attempt; gpt-6.1-sol max for the final attempt, using the exact commands below with MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Total budget $25. That Stage 1 authorization did not authorize later kits; Stage 2 preparation is separately approved below. |
 | Approved | Provider-side spending cap: owner-confirmed as configured for this $25 budget. Not independently verified. The unchanged runner does not enforce, track or aggregate dollars; it bounds attempts and time only. |
-| Approved | Stage 2 kit preparation and kit commit only now; eventual runner retains authorized attempt-owned commit/discard permissions and model identities, but requires parent review before launch. No increased $25 budget, installs/remotes/publication/Stage 3 or preparation model calls. |
+| Superseded | Stage 2 kit preparation and kit commit only; launch then required parent review. Superseded by the Stage 2 run decisions below. No increased $25 budget, installs/remotes/publication/Stage 3 or preparation model calls. |
+| Approved | Parent review of the verified Stage 2 kit (kit commit `67813b6`) is complete. The Stage 2 implementation loop is authorized with the exact commands in the Stage 2 kit operation section: Haiku-5.5 for normal first attempts, gpt-6.1-sol high for the second attempt and gpt-6.1-sol max for the final attempt, using MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Prior permissions continue for runner commits of passing attempts and discards of only attempt-owned failed changes. The original $25 total budget is not expanded. Stage 3, later kits, installs, remotes and publication are not authorized. |
+| Approved | Stage 2 provider-side spending caps: owner-confirmed as configured. Not independently verified. The unchanged runner does not enforce, track or aggregate dollars; total spend and remaining funds are unknown. |
 | Approved | Temporary Stage 2 unsupported observe boundary described below preserves state for windowed/outlier observations rather than inventing partial window/outlier behavior. Final Stage 3 contract is unchanged. |
 | Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
 | Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and benchmarks; decide before the affected stage. No task may assume them. |
 
-**Current gate: Stage 2 kit review, before implementation loop.** Stage 1 remains
-implemented. Stage 2 preparation is authorized, including a verified local kit
-commit; no coder/model launch occurs during preparation. A parent review and
-explicit launch authorization are required before the eventual bounded run.
-The original $25 constraint is unchanged; total spend and remaining funds are
-unknown. Provider-side caps are owner-confirmed, not independently verified.
-No installs, remotes, publication, Stage 3 or additional model calls are authorized.
+**Current gate: authorized Stage 2 implementation run.** Stage 1 remains
+implemented. Parent review of the Stage 2 kit is complete, and the owner has
+authorized the bounded run in the Stage 2 kit operation section. That run had not
+started when this status was committed. The original $25 constraint is unchanged
+and not expanded; total spend and remaining funds are unknown. Provider-side caps
+are owner-confirmed, not independently verified. No installs, remotes, publication,
+Stage 3, later kits, or model calls beyond the authorized runner attempts are authorized.
 
 ### Temporary Stage 2 execution boundary (approved)
 
@@ -612,7 +615,7 @@ Prepare **one bounded kit at a time**: protect the
 approved README, use subordinate supporting spec/promise-to-test mapping,
 non-vacuously failing stubs, private passing reference, runner-judge and full
 stage checks. Return for review between kits. Stage 1 is implemented on this
-branch; Stage 2 is a kit only, awaiting review before a loop.
+branch; Stage 2 has a parent-reviewed kit whose bounded implementation run is authorized but not yet run at this status.
 
 1. **Exact pacing:** Rate/Pacer/Span, error/input envelopes, immutable chaining,
    all pacing examples, independent rational oracle and extreme boundaries.
@@ -635,7 +638,7 @@ written by the runner's coder and judged by the unchanged runner and Mix command
 that is not owner, live-model or integration acceptance. There is no completed port,
 installed/published package, complete follower verification, Go differential corpus,
 performance result, live-model trial or real-device validation. Source Go
-results are not port evidence. The current gate is review of the Stage 2 kit before any implementation launch.
+results are not port evidence. The current gate is the authorized Stage 2 implementation run and its review; no Stage 3 is authorized.
 
 **Kit-preparation evidence (historical, before the run; Elixir 1.20.4 / OTP 29):**
 unchanged runner `--check` passed all four tasks on the private reference: 9, 21,
@@ -739,6 +742,9 @@ all tests, READMEs, config, seams and harness files are protected.
 
 Prerequisites remain Bash/Git/jq/timeout (or gtimeout), installed Elixir/Mix/OTP
 and pi; no installs/fetches. Verification uses Elixir 1.20.4 / OTP 29 only.
+Launch-time prerequisite check (before this status commit): pi 1.6.0, jq 1.7.1,
+`/usr/bin/timeout`, Bash 3.2, Git 2.54, Mix 1.20.4 / OTP 29; the runner copy matches
+the skill source byte-for-byte.
 From the checkout, review before launch:
 
 ```sh
@@ -767,8 +773,8 @@ skill source; its 26 disposable regression cases and 26 mutation checks pass.
 These are local feasibility results, not coder implementation, complete follower,
 Go parity, real-device use or a wider runtime matrix. No coder/model was launched.
 
-**STOP here for parent review.** Only after a separate launch authorization,
-from the clean committed non-main kit checkout, the exact eventual command is:
+**Parent review complete; run authorized.** From the clean committed non-main kit
+checkout, the authorized command is:
 
 ```sh
 MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \

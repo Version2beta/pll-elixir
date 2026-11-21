@@ -93,10 +93,11 @@ Private references/evidence stay outside the coder checkout; coder must not read
 outside implementations/references, including sibling repositories. Existing
 .loop attempt state is preserved; new IDs are S2-prefixed and collision-free.
 
-Stage 2 kit preparation/commit only now. STOP for parent review before launch.
-Exact eventual commands/limits and original unchanged $25 constraint are in root
-README; caps are owner-confirmed, not independently verified, total spend unknown.
-No additional model calls, Stage 3, remotes or installs during this preparation.
+Parent review of this kit is complete. The authorized Stage 2 implementation run
+uses the exact commands and limits in root README; the original $25 constraint is
+unchanged and not expanded. Caps are owner-confirmed, not independently verified;
+total spend is unknown. Model calls are limited to authorized runner attempts; no
+Stage 3, remotes, installs or later kits are authorized.
 Reference/fixture results are not coder implementation, complete parity, live
 integration, performance, security or real-use acceptance. A contract blocker
 must stop the run through the harness; progress notes alone cannot stop retries.

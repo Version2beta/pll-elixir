@@ -4,7 +4,8 @@ Current state (author review gate): the owner-authorized Stage 1 runner complete
 kit/stage1-exact-pacing. T1 (792e3f8), T2 (7b4603e) and T3 (d999aac) each passed on
 the first claude-haiku-5-5 attempt; T4 (whole stage) passed the runner judge with 38
 tests. No gpt-6.1-sol escalation and no STOP. Total spend unknown; the owner-reported
-provider cap is not independently verified. No further loop is authorized.
+provider cap is not independently verified. No further Stage 1 loop is authorized; the
+Stage 2 run is recorded at the end of this file.
 
 Kit preparation (historical, before the run) verified protected seams/tests against an
 external private reference using unchanged runner --check: T1 9, T2 21, T3 8, T4 38 passing tests.
@@ -26,7 +27,8 @@ T3: Implemented valid nonzero set_trim in lib/pll/pacer_core.ex (new private ret
 T3 remaining/blocks: none found; no new contract gap; no private reference or external implementation consulted; Go source not read; no protected files edited. Runner judgment and commit remain for the runner; follower work remains out of scope.
 
 # Stage 2 kit checkpoint (supersedes prior no-follower authorization statements)
-Stage 2 preparation and a verified kit commit are authorized; no coder launch yet.
+Historical: Stage 2 preparation and a verified kit commit were authorized, with no coder
+launch at that checkpoint (superseded by the run authorization below).
 Temporary unsupported errors for windowed/outlier observations are approved;
 full windows/outliers/steps remain Stage 3. Delivered follower core is a stub.
 Stage 1 remains implemented and protected. Parent reviews verified kit before any
@@ -46,5 +48,15 @@ trim saturation and Imax binary64 lock threshold within existing test groups.
 Counts unchanged: reference tasks 9/21/8/4/4/9/55 all pass; delivered stubs retain
 38 Stage 1 passes and fail every S2 task (39/55 whole tree, 16 failures).
 Reference verification used a separate temporary overlay on actual Stage 1;
-owner checkout implementation stubs were never replaced. STOP for parent launch
-gate; no coder/model calls or Stage 3 work performed.
+owner checkout implementation stubs were never replaced. That preparation ended at its
+parent launch gate; no coder/model calls or Stage 3 work were performed then.
+
+# Stage 2 parent review and run authorization (current)
+Parent review of the Stage 2 kit (kit commit 67813b6) is complete. The owner authorized
+the Stage 2 implementation run with the root README command: claude-haiku-5-5 for normal
+attempts, gpt-6.1-sol high for the second attempt, gpt-6.1-sol max for the final attempt,
+MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200, JUDGE_TIMEOUT=300. Runner commit and
+discard permissions continue for attempt-owned changes only. The original $25 budget is
+not expanded; caps are owner-confirmed, not independently verified; total spend is unknown.
+The run had not started when this checkpoint was committed. The temporary :unsupported
+boundary is unchanged until Stage 3. Stage 3 and later kits remain unauthorized.
