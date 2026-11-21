@@ -175,3 +175,15 @@ Public smoke: 18 rows in 0.26 s including startup, window accepted2/pending10,
 step rejected8/stepped4. Counts remain six benchmark tests/72 total. Evidence in
 docs/benchmark-verification.md. Protected source/old tests and owner runner stub
 unchanged. No model/real implementation loop; stop for parent launch review.
+
+# Benchmark launch gate (parent review passed)
+Parent review of the benchmark kit (HEAD 4867fc4d82168e230c37ea2022ca28a2b6eb0da1 on
+kit/throughput-benchmark) passed, including the independent-review strengthening recorded in
+docs/benchmark-verification.md. One owner-authorized coding loop is permitted with the README
+command: claude-haiku-5-5 for normal attempts, gpt-6.1-sol high for the second attempt and
+gpt-6.1-sol max for the final attempt; MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200,
+JUDGE_TIMEOUT=300. Runner commit/discard permissions apply only to passing attempts and
+attempt-owned failures. The original $25 total is not expanded; provider caps are
+owner-confirmed, not independently verified; spend is unknown. Only scripts/bench/runner.exs
+is coder work; library, tests, fixtures and README/SPEC are unchanged by the loop. The loop
+had not started at this checkpoint.

@@ -3,6 +3,7 @@
 > **Stage 3 implementation completed by the single authorized runner run (exit 0); author review gate.** Completed observe never emits `:unsupported`. Evidence is finite fixtures only: not universal parity, live integration, security or performance.
 > Stage 1, Stage 2 and Stage 3 are implemented; the full normative follower contract below is unchanged.
 > Stage 2 run limitations/approvals below are historical, not current launch authority.
+> Benchmark: parent launch review passed; one owner-authorized coding loop is the current step (see Throughput benchmark). No benchmark loop has run at this checkpoint.
 
 This library helps audio/video, sensor, packet and device-buffer applications
 pace units on their own timeline or learn the relationship to another clock.
@@ -32,10 +33,11 @@ They work separately or together: follower trim can steer a pacer.
 | Approved | Dependency-free line-oriented corpus with decimal integers and hex binary64; separately authorized temporary offline generator against the pinned public Go API, leaving ../pll untouched. No network or dependency fetches. |
 | Approved | Stage 3 parent review passed for the verified kit and the 159-record public-Go corpus. This records no normative API or test change. One Stage 3 implementation run is authorized with the exact command in the Stage 3 kit operation section: claude-haiku-5-5 for normal attempts, gpt-6.1-sol high for the second attempt and gpt-6.1-sol max for the final attempt, using MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Prior runner commit and discard permissions apply only to passing attempts and attempt-owned failures. The original $25 total is not expanded; provider caps are owner-confirmed, not independently verified, and spend is unknown. No later kits, installs, remotes or publication are authorized. |
 | Approved | Bounded dependency-free public-API throughput harness kit and verified kit commit; tool-only clock/introspection/output effects as described below. Parent review before coding loop; no expanded budget, library changes or dependencies. |
+| Approved | Parent launch review of the benchmark kit (HEAD `4867fc4d82168e230c37ea2022ca28a2b6eb0da1`, branch `kit/throughput-benchmark`) passed, including the independent-review strengthening in [benchmark verification](docs/benchmark-verification.md). One coding loop is authorized with the exact command in the Benchmark kit operation section: claude-haiku-5-5 for normal attempts, gpt-6.1-sol high for the second attempt and gpt-6.1-sol max for the final attempt, using MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Runner commit and discard permissions apply only to passing attempts and attempt-owned failures. Only `scripts/bench/runner.exs` is writable implementation. The original $25 total is not expanded; provider caps are owner-confirmed, not independently verified, and spend is unknown. No library change, dependency, installation, remote, publication or additional loop is authorized. |
 | Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
 | Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and broader benchmarks; decide before the affected stage. No task may assume them. |
 
-**Current gate: author review of the completed Stage 3 implementation (run completed once; no further loop authorized).**
+**Current gate: benchmark coding loop authorized after parent launch review (single run; not yet run at this checkpoint).**
 See [Stage 3 verification](docs/stage3-verification.md) and operation commands at
 end of this README. The original total $25 constraint is unchanged; provider caps
 are owner-confirmed, not independently verified, and spend/remaining are unknown.
@@ -871,7 +873,7 @@ spend/remaining unknown. Attempt/time limits do not enforce dollars. No preparat
 model calls, remotes, installs, publication or later kits. Runtime matrix/release
 and adapters remain deferred until separately reviewed.
 
-## Throughput benchmark (approved bounded tool; implementation pending review)
+## Throughput benchmark (approved bounded tool; parent launch review passed, one loop authorized)
 
 This dependency-free developer harness measures this Elixir implementation, not
 Go speed or real-time scheduling. It is separate from the pure runtime library.
@@ -961,7 +963,7 @@ write ignored build caches/start VM processes as usual. The harness itself does
 not write results, spawn workload processes, read environment/secrets, contact
 network, sleep or tune VM globals. No permanent results/artifact format is added.
 
-### Benchmark kit operation — parent review gate, do not launch yet
+### Benchmark kit operation — parent review passed; one authorized loop
 
 Prepared directly on `kit/throughput-benchmark` over actual clean Stage 3 HEAD
 `03a99baca1db2872f6e6f9298914aab9e2242a2a`; no archive to apply. Existing `.loop/`
@@ -972,7 +974,7 @@ READMEs, supporting contracts, config and complete parser/entrypoint are protect
 No private reference is included or available to the coder.
 
 Prerequisites unchanged: installed Bash/Git/jq/timeout (or gtimeout), Elixir/Mix/OTP;
-pi only for a separately reviewed launch. No installs/fetches. Check locally:
+pi only for the single authorized loop below. No installs/fetches. Check locally:
 
 ```sh
 git status --short
@@ -985,9 +987,8 @@ bash scripts/loop.sh --check
 ```
 
 `--check` makes no model calls. Verified evidence and protection inventory:
-[benchmark kit verification](docs/benchmark-verification.md). Kit-only commit is
-authorized; **stop for parent review before any implementation loop**. The eventual
-command remains unchanged, shown for review only, NOT a launch instruction now:
+[benchmark kit verification](docs/benchmark-verification.md). Parent launch review
+passed; the following single implementation loop is authorized and is the only loop permitted:
 
 ```sh
 MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \

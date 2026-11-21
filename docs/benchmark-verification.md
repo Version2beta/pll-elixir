@@ -70,6 +70,15 @@ validate only positive units; restore default lock threshold 100000. Unmodified
 reference passes 6/6. No model/coder calls; owner implementation remains stubbed.
 Unchanged runner and full decoded grep-ERE protection inventory rechecked.
 
+## Parent launch gate (passed; one loop authorized, not yet run)
+
+Parent launch review of the kit at 4867fc4d82168e230c37ea2022ca28a2b6eb0da1 passed.
+The independent-review strengthening above is part of the reviewed kit. The owner
+authorized one coding loop with the README command only (Haiku normal; gpt-6.1-sol
+high second attempt; gpt-6.1-sol max final; MAX_ITER=12, MAX_ATTEMPTS=3,
+ITER_SECONDS=1200, JUDGE_TIMEOUT=300). Only scripts/bench/runner.exs is coder work.
+This checkpoint predates the loop: no coder/model calls, benchmark run or result exist yet.
+
 ## Limitations and next gate
 
 Reference evidence proves bounded feasibility on actual Stage 3, not a completed
@@ -81,7 +90,7 @@ performance thresholds, Go comparison, live clock/device/network integration,
 security audit, publication or broad runtime matrix is established.
 
 All recorded benchmark output remains temporary outside the checkout; no permanent
-results format is added. Reference code must not be exposed to coder. Parent review
-is required before any real model loop. Original aggregate $25 unchanged; provider
+results format is added. Reference code must not be exposed to coder. Parent launch review
+passed; a single owner-authorized loop is permitted. Original aggregate $25 unchanged; provider
 caps owner-confirmed, not verified; spend and remaining amount unknown. No extra
 models/fanout, installs, remotes, sibling writes, library refactors or publication.

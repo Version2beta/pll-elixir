@@ -42,7 +42,8 @@ No wallclock thresholds. Input errors exit 2 via protected entrypoint, no worklo
 All library/tests/fixtures/supporting docs/config/complete seams protected.
 Local freedom: helper functions in runner.exs only. No extra files or refactoring.
 
-No coder/model loop before parent review. Original $25 unchanged; caps reported,
+Parent launch review passed at 4867fc4; one owner-authorized coder loop with the
+README command only. Original $25 unchanged; caps reported,
 not independently verified, spend unknown. No installs/remotes/publication.
 Broader benchmarks, adapters/products, runtime matrix and aggregate spending
 accounting remain deferred until their affected stage is explicitly approved.
