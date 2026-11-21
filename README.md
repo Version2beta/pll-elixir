@@ -1,8 +1,8 @@
 # pll-elixir — exact pacing and clock following
 
-> **Stage 3 overlay kit prepared for parent review; no implementation loop launched.**
+> **Stage 3 kit passed parent review (kit and 159-record public-Go corpus); one owner-authorized Stage 3 implementation run is authorized and has not run at this commit.**
 > Stage 1 and bounded Stage 2 are implemented. Supplied Stage 3 history paths are
-> intentionally unfinished. The full normative follower contract below is unchanged.
+> intentionally unfinished until that run. The full normative follower contract below is unchanged.
 > Stage 2 run limitations/approvals below are historical, not current launch authority.
 
 This library helps audio/video, sensor, packet and device-buffer applications
@@ -31,10 +31,11 @@ They work separately or together: follower trim can steer a pacer.
 | Superseded | Temporary Stage 2 unsupported observe boundary described below preserves state for windowed/outlier observations rather than inventing partial window/outlier behavior. Final Stage 3 contract is unchanged. |
 | Approved | Stage 3 overlay kit preparation and verified complete kit commit only, followed by parent review before any coding loop. Complete windows/outliers/steps, edge/retry cases, deterministic synthetic integration, public-Go differential corpus and all examples/regressions. Prior runner commit/discard permissions remain scoped to passing attempts/attempt-owned failures. No preparation model calls, installs, remotes, publication or later kits. Original $25 total is not expanded; caps remain owner-confirmed, not independently verified, spend unknown. |
 | Approved | Dependency-free line-oriented corpus with decimal integers and hex binary64; separately authorized temporary offline generator against the pinned public Go API, leaving ../pll untouched. No network or dependency fetches. |
+| Approved | Stage 3 parent review passed for the verified kit and the 159-record public-Go corpus. This records no normative API or test change. One Stage 3 implementation run is authorized with the exact command in the Stage 3 kit operation section: claude-haiku-5-5 for normal attempts, gpt-6.1-sol high for the second attempt and gpt-6.1-sol max for the final attempt, using MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Prior runner commit and discard permissions apply only to passing attempts and attempt-owned failures. The original $25 total is not expanded; provider caps are owner-confirmed, not independently verified, and spend is unknown. No later kits, installs, remotes or publication are authorized. |
 | Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
 | Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and benchmarks; decide before the affected stage. No task may assume them. |
 
-**Current gate: parent review of the verified Stage 3 kit, before any coding loop.**
+**Current gate: Stage 3 parent review passed; one authorized Stage 3 implementation run (not yet executed at this commit).**
 See [Stage 3 verification](docs/stage3-verification.md) and operation commands at
 end of this README. The original total $25 constraint is unchanged; provider caps
 are owner-confirmed, not independently verified, and spend/remaining are unknown.
@@ -814,7 +815,7 @@ seams; no Stage 1 refactoring or dependencies. Deferred until Stage 3: window,
 outlier, step histories and shared Go fixture encoding/corpus; wider runtime,
 release/publication and adapters need later review. New contract gaps block work.
 
-## Stage 3 kit operation (current preparation; parent gate before launch)
+## Stage 3 kit operation (parent review passed; single authorized run)
 
 Prepared directly on `kit/stage3-follower-parity`, over actual Stage 2 commit
 `e3352c209a2ba75359018f579643d7debc265382`; no archive to apply. The kit includes
@@ -848,8 +849,8 @@ fail. On the external reference all tasks and 66 tests pass. Exact evidence,
 limitations and intentional supersession: [verification](docs/stage3-verification.md).
 No private reference may be copied into the coder checkout or read by the coder.
 
-**Do not execute before parent review.** Eventual exact command, without model
-substitution or increased budget:
+**Authorized single run.** Exact command, without model substitution or increased
+budget:
 
 ```sh
 MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \

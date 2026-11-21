@@ -85,6 +85,7 @@ any later authorized paid run.
 
 Stage 3 preparation/verified-kit commit approved. Encoding and temporary offline
 public-Go harness explicitly approved; source read-only, no dependency fetches.
-No implementation loop before parent review. Original $25 total unchanged;
+Parent kit and corpus review passed; one owner-authorized Stage 3 implementation
+run is authorized (README command, no model substitution). Original $25 total unchanged;
 caps owner-confirmed, not independently verified, spend/remaining unknown.
 Publication, broader runtime matrix and products/adapters remain deferred.

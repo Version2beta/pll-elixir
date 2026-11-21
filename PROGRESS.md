@@ -120,3 +120,13 @@ order checks. Exact clean corpus trim replay passed and tolerance is tightened t
 exact. Docs distinguish finite exact numerical fixtures from universal float
 identity and no longer disclose private reference/evidence locations. Counts remain
 66 total/20 S3-history. No coder/model calls; parent launch gate remains required.
+
+# Stage 3 launch gate (parent review passed)
+Parent review of the Stage 3 kit (kit commit 460ef51) and the 159-record public-Go corpus
+passed. Docs now record one owner-authorized Stage 3 implementation run with the README
+command: claude-haiku-5-5 for normal attempts, gpt-6.1-sol high for the second attempt and
+gpt-6.1-sol max for the final attempt; MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200,
+JUDGE_TIMEOUT=300. Runner commit/discard permissions apply only to passing attempts and
+attempt-owned failures. The original $25 total is not expanded; provider caps are
+owner-confirmed, not independently verified; spend is unknown. This gate update changes
+no normative API, SPEC or test contract. The run had not started at this checkpoint.

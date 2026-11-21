@@ -1,4 +1,4 @@
-# Stage 3 kit evidence — parent review gate
+# Stage 3 kit evidence — parent review passed
 
 Prepared on kit/stage3-follower-parity over ACTUAL runner-written Stage 2
 `e3352c209a2ba75359018f579643d7debc265382`, not a prior private-reference substitute.
@@ -45,8 +45,8 @@ replaced by S3-tree. No old logs/attempt metadata deleted.
   identical after gofmt; tests replay checked-in bytes without Go. All statuses
   present: 125 accepted, 7 anchored, 8 pending, 6 rejected, 1 stepped successful
   observe records; 3 order and 1 overflow observe errors. See corpus.md for exact
-  schema/provenance and numerical acceptance. Parent review of corpus remains
-  part of this gate, not presumed approved merely from format approval.
+  schema/provenance and numerical acceptance. Parent review of the corpus passed
+  before the single authorized Stage 3 run.
 - Synthetic loop estimates are also compared against the independent literal
   equation model extended with a first-error run list (exact statuses, <=1 ns
   error/mapping, <=1e-12 offset), not only rate-bound invariants.
@@ -104,5 +104,6 @@ parity. Synthetic integration is deterministic, not live device/network testing.
 No broader runtime matrix, performance/security/release/live-model/owner-use
 acceptance. Runtime effects are constrained by library design/tests, not a process
 sandbox. Provider caps owner-confirmed only; spend/remaining unknown, original
-$25 total unchanged, no added authorization. Parent reviews this complete kit and
-corpus before any implementation loop. No later kits/install/remotes/publication.
+$25 total unchanged, no added authorization. Parent review of this complete kit and the
+159-record corpus passed; one owner-authorized Stage 3 run is recorded in PROGRESS.md
+and README. No later kits/install/remotes/publication.
