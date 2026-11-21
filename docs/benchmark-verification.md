@@ -24,7 +24,7 @@ No broader runtime support evidence is claimed.
   9/21/8/4/4/20/6/72. Whole-tree task also runs public CLI --smoke.
 * Public `mix run scripts/throughput.exs --smoke` reference execution: exit 0,
   18 measured rows (nine workloads x two samples), all positive elapsed_ns and
-  nonzero checksums. Process-level shell elapsed 0.28 s (startup included), not
+  nonzero checksums. Process-level shell elapsed 0.26 s (startup included), not
   a performance guarantee. Header/config/runtime/source labels inspected.
   Due batch units=768/calls=12; claim units=18000/calls=12; span checksum=48384,
   units=768/calls=12. Window statuses accepted=2/pending=10; outlier rejected=12;
@@ -43,6 +43,32 @@ No broader runtime support evidence is claimed.
   (runner implicit kit guards included). All README paths, source, project config,
   test/support/fixtures, corpus generator, docs, complete parser/entrypoint covered.
   Existing .loop logs/state preserved; new BENCH IDs avoid earlier attempts.
+
+## Independent-review strengthening (parent launch gate remains)
+
+Reviewed kit at 5361081; addressed all three P1 gate findings and cheap P2s.
+The six benchmark tests retain their count but now check:
+
+* Exact units per op for every workload; invalid nonzero units/calls and status
+  counts must raise, with no prescribed exception type.
+* Prepared follower states equal independently constructed/anchored public states
+  with both outlier_threshold_ns and lock_threshold_ns set to 10 ns. README
+  threshold wording now names these two fields explicitly (precision only).
+* Inlier/outlier final states equal independent public Follower.observe reductions
+  chaining every next state, for n=1,4,12,17. No private-field inspection or shared
+  execute helper. This detects stale anchored state even when statuses agree.
+* Smoke header includes architecture, pll-throughput-v1 and the full pinned
+  library revision. Zero and negative elapsed fake clocks must raise.
+
+Fresh verification after strengthening: actual prior suite 66 passed; delivered
+stubs 68/72 (four expected failures), BENCH-1/BENCH-tree both fail --check; external
+reference all 72 and every runner task pass. Public smoke produces 18 rows in
+0.26 s startup-inclusive shell elapsed with the representative counts above.
+Four isolated external reference mutations each yield 5/6 benchmark tests passing
+(one failure): reuse initial state for inlier; reuse initial state for outlier;
+validate only positive units; restore default lock threshold 100000. Unmodified
+reference passes 6/6. No model/coder calls; owner implementation remains stubbed.
+Unchanged runner and full decoded grep-ERE protection inventory rechecked.
 
 ## Limitations and next gate
 

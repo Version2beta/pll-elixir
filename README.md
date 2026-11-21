@@ -916,7 +916,8 @@ API, algorithm, private fields or external implementation may be used/changed.
 | step | observe(10*i,10*i+100*ceil(i/3)), threshold 10, step_after=3; 1 reading; floor(n/3) stepped, remaining rejected |
 
 All rates are 10^9 units/s (1 ns period), zero pacer trim. Followers use default
-config except those listed (all follower thresholds here are 10 ns); each sample
+config except those listed (both outlier_threshold_ns and lock_threshold_ns are
+10 ns for every follower workload); each sample
 anchors at (0,0) outside timing. Warmup uses its own n for outlier step_after.
 Issuance does not enumerate spans: checksum adds first+count. Skip checksum adds
 next cursor+due time. Follower checksum adds observation error+input local+remote;

@@ -160,3 +160,18 @@ Only scripts/bench/runner.exs and progress notes are writable. All library sourc
 tests, config, READMEs/docs, complete parser/entrypoint protected. No real loop/model
 calls, installs, remotes/publication or sibling changes. Original $25 total unchanged,
 caps reported not independently verified, spend unknown. Stop for parent review.
+
+
+# Benchmark kit independent-review strengthening — still before launch
+Addressed all P1/P2 review gaps: exact units/all workloads and bad nonzero counts;
+independent full public chained inlier/outlier state reductions; architecture,
+schema/revision smoke labels; nonpositive elapsed rejection without exception-type
+overpinning. README now explicitly names both follower phase/lock thresholds as
+10 ns; external reference configs match (no library/API change).
+Actual prior tests 66/66 pass; stubs 68/72 with both BENCH tasks failing --check;
+external reference 72/72 and all eight unchanged runner tasks pass. Four isolated
+stale-state/positive-units/default-lock mutations each fail one benchmark test.
+Public smoke: 18 rows in 0.26 s including startup, window accepted2/pending10,
+step rejected8/stepped4. Counts remain six benchmark tests/72 total. Evidence in
+docs/benchmark-verification.md. Protected source/old tests and owner runner stub
+unchanged. No model/real implementation loop; stop for parent launch review.

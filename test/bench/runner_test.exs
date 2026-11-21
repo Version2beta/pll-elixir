@@ -51,7 +51,20 @@ defmodule PLLBench.RunnerTest do
       state = Runner.prepare(name, n)
       r = Runner.execute(name, state, n)
       assert r.calls == n
-      assert r.units > 0
+
+      units_per_op = %{
+        due_one: 1,
+        due_batch: 64,
+        claim: 1500,
+        skip: 64,
+        span: 64,
+        inlier: 1,
+        window: 1,
+        outlier: 1,
+        step: 1
+      }
+
+      assert r.units == n * units_per_op[name]
       assert r.checksum != 0
 
       expected_statuses =
@@ -67,8 +80,10 @@ defmodule PLLBench.RunnerTest do
 
       assert r.statuses == expected_statuses
       assert :ok = Runner.validate!(name, r, n)
-      assert_raise MatchError, fn -> Runner.validate!(name, %{r | units: 0}, n) end
-      assert_raise MatchError, fn -> Runner.validate!(name, %{r | statuses: %{bogus: n}}, n) end
+      assert_raises(fn -> Runner.validate!(name, %{r | units: 0}, n) end)
+      assert_raises(fn -> Runner.validate!(name, %{r | units: r.units + 1}, n) end)
+      assert_raises(fn -> Runner.validate!(name, %{r | calls: r.calls + 1}, n) end)
+      assert_raises(fn -> Runner.validate!(name, %{r | statuses: %{bogus: n}}, n) end)
 
       if name in [:due_one, :due_batch, :claim, :skip] do
         assert {:ok, {cursor, _}} = PLL.Pacer.next_due(r.state)
@@ -76,7 +91,33 @@ defmodule PLLBench.RunnerTest do
         assert {:ok, {0, 0}} = PLL.Pacer.next_due(state)
       end
 
-      if name in [:inlier, :window, :outlier, :step], do: assert(r.state != state)
+      if name in [:inlier, :window, :outlier, :step] do
+        {:ok, rate} = PLL.Rate.units_per_second(1_000_000_000, 1)
+
+        config = %{
+          PLL.FollowerConfig.default(rate)
+          | outlier_threshold_ns: 10,
+            lock_threshold_ns: 10,
+            window_ns: if(name == :window, do: 4, else: 0),
+            step_after: if(name == :outlier, do: n + 1, else: 3)
+        }
+
+        {:ok, fresh} = PLL.Follower.new(config)
+        {:ok, anchored, %{status: :anchored}} = PLL.Follower.observe(fresh, 0, 0)
+        assert state == anchored
+        assert r.state != state
+
+        if name in [:inlier, :outlier] do
+          expected =
+            Enum.reduce(1..n, anchored, fn i, previous ->
+              remote = if name == :outlier, do: 10 * i + 100, else: 10 * i
+              {:ok, next, _} = PLL.Follower.observe(previous, 10 * i, remote)
+              next
+            end)
+
+          assert r.state == expected
+        end
+      end
     end
   end
 
@@ -108,6 +149,15 @@ defmodule PLLBench.RunnerTest do
     assert r.process_memory_delta_bytes == -20
     assert r.vm_gc_count_delta == 3 and r.vm_reclaimed_words_delta == 100
     assert r.checksum > 0
+
+    for elapsed <- [0, -1] do
+      Process.put(:ticks, [100, 100 + elapsed])
+      snapshot = fn -> %{memory_bytes: 100, gc_count: 2, reclaimed_words: 20} end
+
+      assert_raises(fn ->
+        Runner.sample(:due_batch, 2, fn -> pop.(:ticks) end, snapshot)
+      end)
+    end
   end
 
   test "finite real timed smoke outputs all samples without timing thresholds" do
@@ -115,9 +165,23 @@ defmodule PLLBench.RunnerTest do
       capture_io(fn -> assert :ok = Runner.main(%{iterations: 12, samples: 2, warmup: 4}) end)
 
     assert output =~ "library_revision"
-    assert output =~ "platform"
+    assert output =~ "architecture"
+    assert output =~ "pll-throughput-v1"
+    assert output =~ "03a99baca1db2872f6e6f9298914aab9e2242a2a"
     assert length(Regex.scan(~r/elapsed_ns:/, output)) == 18
     assert length(Regex.scan(~r/checksum:/, output)) == 18
     for name <- Runner.names(), do: assert(output =~ "workload: :#{name}")
+  end
+
+  defp assert_raises(fun) do
+    raised =
+      try do
+        fun.()
+        false
+      rescue
+        _ -> true
+      end
+
+    assert raised, "expected an exception, without prescribing its type"
   end
 end

@@ -31,9 +31,13 @@ Preserve T1/T2/T3/S2-config/S2-mapping/S3-history: 9/21/8/4/4/20 tests (66 total
 Replace old S3-tree with final BENCH-tree, preserving historical .loop state.
 BENCH-1 (normal): test/bench/runner_test.exs, 6 tests: option bounds/errors,
 metric arithmetic, all nine real chained public workloads and independent status
-counts, checksum enumeration, fake timing/introspection report deltas, finite
-real timed smoke with 18 observed rows. BENCH-tree: formatting including scripts,
-warnings-as-errors, all 72 tests and public CLI smoke. Both must fail stubs.
+counts and full independent public reductions for inlier/outlier final states,
+exact units/calls and invalid nonzero counts, checksum enumeration, fake
+timing/introspection report deltas and nonpositive elapsed rejection, finite
+real timed smoke with schema/architecture/pinned revision and 18 observed rows.
+Validation requires an exception, not a specific exception type. Both follower
+outlier_threshold_ns and lock_threshold_ns are 10 ns. BENCH-tree: formatting
+including scripts, warnings-as-errors, all 72 tests and public CLI smoke. Both must fail stubs.
 No wallclock thresholds. Input errors exit 2 via protected entrypoint, no workload.
 All library/tests/fixtures/supporting docs/config/complete seams protected.
 Local freedom: helper functions in runner.exs only. No extra files or refactoring.
