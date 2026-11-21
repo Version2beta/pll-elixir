@@ -9,4 +9,11 @@ defmodule PLL.Error do
   def message(%__MODULE__{code: :invalid_rate}), do: "pll: invalid rate"
   def message(%__MODULE__{code: :invalid_argument}), do: "pll: invalid argument"
   def message(%__MODULE__{code: :overflow}), do: "pll: overflow"
+  def message(%__MODULE__{code: :order}), do: "pll: reading out of order"
+  def message(%__MODULE__{code: :not_anchored}), do: "pll: follower has no reading yet"
+
+  def message(%__MODULE__{code: :config, field: field, reason: reason}),
+    do: "pll: FollowerConfig.#{field} #{reason}"
+
+  def message(%__MODULE__{code: :unsupported}), do: "pll: unsupported in Stage 2"
 end

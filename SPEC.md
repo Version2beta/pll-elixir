@@ -1,102 +1,102 @@
-# Stage 1 supporting contract — exact pacing
+# Stage 2 supporting contract — bounded mapping and inlier loop
 
-This file is subordinate to the approved root [README.md](README.md), especially
-Decisions, Public API, Types/bounds/errors, Exact pacer contract and Ownership.
-A conflict blocks work; it is never permission to override README promises.
+Subordinate to approved root README.md: Decisions/temporary Stage 2 boundary,
+Public API, Types/bounds/errors, Follower configuration, Follower state machine,
+Queries and Ownership. README wins; conflicts/new promises block work.
 
-## Approved scope and boundaries
+## Approved scope and seams
 
-Only PLL.Rate, PLL.Pacer, PLL.Span and stage error values. Elixir >=1.15 /
-OTP >=26 baseline; verification on 1.20.4 / OTP 29 only. No dependencies.
-No follower implementation, Go corpus/harness, CLI, adapters, release, remote,
-installation or publication. All future follower contracts remain in README.
+Preserve every Stage 1 guarantee unchanged. Add config, anchoring, ordering,
+mapping/rounding, gain/rate updates, accepted inliers, lock/jitter/holdover/reset,
+transactional overflow and first follower-to-pacer example. No dependencies,
+I/O, implicit clocks, process/global state, adapters, installs or publication.
+Stage 3 windows/outliers/steps and Go parity corpus remain deferred. The follower
+is not complete. No task may implement Stage 3 or assume a fixture encoding.
 
-The public modules/types and segment snapshot are complete protected seams.
-Factory terms reduce by gcd. The segment pn/pd is a positive exact period in
-nanoseconds; it may be reduced, but must represent den*10^21/(num*(10^12+q)).
-Pacer carries nominal Rate, cursor, segment; Span carries first/count/segment.
-Representation is not a serialization promise. Only factory/transition-issued
-values (plus zero Rate/Span sentinels) need support; manually forged states
-are unsupported. Wrong struct kinds raise ArgumentError, not FunctionClauseError.
-All exported names/signatures/docs are fixed. Implementation lives in the supplied
-*_core.ex seams and, if useful, new private helper modules. Public wrappers,
-getters, String.Chars dispatch and error messages are complete, not coder work.
-PLL.Error.message covers the three Stage 1 codes; future follower codes remain
-outside this stage. The development version 0.0.0-dev is not a release promise.
+All supplied public modules/data types are complete and protected. Follower
+carries config plus immutable mapping/reference/order/lock/jitter data, not a
+serialized format. Unsupported forged structs need not work. New private helpers
+are allowed, but only FollowerCore and new helper files are implementation work;
+all Stage 1 source is protected, with no unrelated refactor. Exported names,
+signatures/docs stay fixed. Config.default does not validate nominal. Config
+validation follows README table order, including all fields deferred in use.
 
-Use unbounded integer arithmetic. See README for exact due vs floor/ceiling,
-slot U exclusion, claim last-floor check, skip semantics, no-op trim before
-anchor checks, and floor anchoring. Every error is exactly {:error, %PLL.Error{}}
-with the specified code and nil field/reason, no state/output. Every success
-returns state before output. Validate all scalar types/envelopes left-to-right before any semantic checks,
-then validate semantics. Thus units_per_second(0,U+1) and due(p,-1,U+1)
-return overflow. Wrong state kind raises before scalar validation. New
-ambiguities must be returned for review. Never read implicit time, spawn,
-sleep, perform I/O/network/environment access, or mutate process/global state.
+Implement exact error shapes with nil field/reason except config errors. Wrong
+state kinds raise ArgumentError. Scalar types/envelopes validate left-to-right
+before semantics. Observe then checks existing order, then unsupported boundary:
+window_ns>0 always unsupported, including first anchor; window=0 first reading
+anchors; later abs(unrounded e)>float(outlier_threshold_ns) unsupported. No
+metadata changes or replacement state on any failure. Otherwise feed the inlier.
+No fabricated pending/rejected/stepped behavior in this stage. Error message is
+`pll: unsupported in Stage 2`. Remove this temporary boundary only in Stage 3.
 
-## Promise to acceptance checks
+Use README equations and rounding of displacement, not absolute time. Subtract
+signed-fitting integer differences before conversion; wide differences use
+float(a)-float(b). Add rounded displacement exactly to integer anchors, allowing
+wide cancellation. Float-domain phase/lock comparisons convert integer thresholds
+to binary64, matching pinned Go follower.go outlier/lock comparisons (revision
+971282632129110794c9d6edd22026e9de2359be); envelopes/order/elapsed remain exact.
+At Imax threshold, binary64 e=-2^63 is an inlier and its reported error saturates
+to Imin; this does not relax exact integer input bounds.
 
-All tests use the public API; no production arithmetic helpers in the oracle.
+Evaluate gain caps without overflowing BEAM float products or reciprocals:
+all finite positive bandwidth/damping are valid, including subnormals and max
+binary64. Private helper algorithms are local freedom, not changed equations.
+Check new integer anchor before exposing any transition. dt=0 leaves mapping,
+rate and reference unchanged but updates accepted/lock/jitter/order data.
+Jitter uses unrounded errors and requires two inliers before a nonzero getter.
+Holdover is a query only; reset retains config but clears all learned history.
+No hidden runtime effects or dependencies. Elixir 1.20.4 / OTP29 is the verified
+machine, not a claim of wider runtime acceptance.
 
-| README promise | Protected checks / task |
+## Promise-to-test mapping and tasks
+
+| README guarantee | Protected checks / task |
 | --- | --- |
-| Rate factories, gcd, full uint64 terms, getters, exact strings/protocol, zero sentinel, scalar envelopes, wrong kinds, stage messages | test/pll/rate_test.exs / T1 |
-| Immutable cursor, due exactness/floor neighbors, ceilings, earlier-now backlog/caps, claim/skip/keep=0, >10^9 units/s, empty spans | test/pll/pacer_test.exs / T2 |
-| U never issued/skipped; cursor U and conditional overflow, capped latest slot, Imax floor-fit/ceiling-overflow, failure preservation | test/pll/pacer_test.exs / T2 |
-| Span floor, exact index exception categories, zero/issued empty, fresh reusable lazy Enumerable and early halt on enormous extent | test/pll/span_test.exs / T2 |
-| First useful 48k example, 30000/1001 example, byte starts | test/pll/readme_test.exs / T2 |
-| Trim limits, same-trim true no-op, floor anchor, large periods, original snapshots/issued spans, skip/slow README example | test/pll/trim_test.exs / T3 (invalid trims also T2) |
-| Independent rational model, full result/state/error comparisons, seeded operation chains, extreme terms/trims/cursors and retained spans | test/support/rational_oracle_helper.exs and test/pll/model_test.exs / T3 |
-| Formatting, warnings-as-errors, complete discovered suite with exact observed count | T4, last; top-level format_check/check also run by judge |
+| Stage 1 Rate factories, gcd, uint64 terms, strings, zero sentinel, validation/messages | rate_test.exs / T1, 9 tests |
+| Stage 1 exact due/floor/ceil, claims, skip, cursor U, bounds, empty/lazy spans, retained snapshots, pacing examples | pacer_test.exs, span_test.exs, readme_test.exs / T2, 21 tests |
+| Stage 1 trim/no-op/floor anchor/bounds and independent rational oracle | trim_test.exs, model_test.exs, rational_oracle_helper.exs / T3, 8 tests |
+| Full defaults, zero config, field order/reasons, types/envelopes, finite extremes, status/state/error spelling | follower_config_test.exs / S2-config, 4 tests |
+| Anchoring, unanchored/scalar errors, half ties, >2^53 anchors, wide cancellation and exact binary periods via integer oracle | follower_mapping_test.exs / S2-mapping, 4 tests |
+| Moderate independent equations, 240 updates, offset/mapping/jitter tolerance | follower_loop_test.exs + follower_equation_oracle_helper.exs / S2-loop |
+| dt=0, lock equality/clearing/default eight-sample chain, two-inlier jitter, exact holdover and reset, immutable snapshots | follower_loop_test.exs / S2-loop |
+| Temporary unsupported paths, unrounded classification, precedence and valid continuation, feed overflow rollback | follower_loop_test.exs / S2-loop |
+| Extreme finite gain combinations, cap/underflow, offset clamp/trim saturation, Imax threshold/error/jitter saturation | follower_loop_test.exs / S2-loop |
+| First follower-to-pacer README workflow, failed transitions retain old states | follower_loop_test.exs / S2-loop, 9 tests total |
+| Formatting, warnings-as-errors, full discovered tree | S2-tree, 55 tests |
 
-The oracle retains raw rate terms, evaluates unreduced numerator/denominator
-pairs directly from the README formula, and binary-searches exact due boundaries
-instead of using the production inverse-period approach. It uses no production
-timing helper. There are 48 deterministic seeded chains of 80 operations plus
-hand-selected boundary chains. Large spans are sampled, never materialized.
-The huge-extent early-halt fixture rejects eager enumeration in practice, not
-an allocation or universal computational-complexity proof.
+T1–T3 unchanged; prior T4 is replaced, not left mid-list. Every new implementation
+task and final whole-tree check must fail delivered stubs. All prior Stage 1
+checks pass on those stubs. All tasks must pass the unchanged runner --check on
+a private reference overlaid onto the ACTUAL Stage 1 implementation. Expectations
+pin installed ExUnit stdout counts with no skips/exclusions. Checks launch no
+coder/model or network calls. Different summary/runtime requires re-verification,
+not weakening expectations. No test claims the entire follower is complete.
 
-## Task boundaries and verification
+The moderate oracle implements literal equations independently, without production
+helpers/structs; tolerance <=1ns error/mapping, <=1e-12 offset, <=2ns jitter.
+Exact integer boundary fixtures do not use these tolerances. Extreme-gain checks
+use hand-derived cap limits: x=0.5 for max bandwidth, x effectively zero for
+subnormal bandwidth at these dt values; kp=1 only when capped x and max damping.
+Expected offset is -0.25/1.001*0.001, tolerance 1e-15. Overflow-safe arithmetic
+was experimentally checked before building these tests; test evidence is local
+feasibility, not universal binary64 identity or arbitrary-distance accuracy.
 
-T1 implements RateCore. T2 implements untrimmed PacerCore/SpanCore, including
-validation of invalid trims; T3 adds valid trim transitions and whole-state
-rational comparisons. T4 is integration, not a padded independent feature.
-Earlier tests must continue passing. During kit preparation, all meaningful tasks
-and the whole-tree check were verified to fail supplied stubs and pass the private
-reference using unchanged scripts/loop.sh --check. On the owner checkout the runner
-then committed passing T1–T3 implementations, and T4 passes the whole stage.
-Exact stdout summaries are pinned to installed ExUnit 1.20.4; on another ExUnit summary version stop for kit re-verification rather
-than weakening expectations. No test is skipped/excluded.
+## Protected inventory and gate
 
-Protected inventory: root README.md (and any nested approved README), SPEC.md,
-PROMPT.md, tasks.json, scripts/loop.sh, .gitignore, .formatter.exs, mix.exs,
-LICENSE, any config/ directory, every test/support file, and complete
-lib/pll/{error,segment,rate,pacer,span}.ex. PROGRESS.md and the *_core.ex files are
-intentionally writable. No private reference belongs in this repository. .loop/, _build/ and existing transient
-.wtha/ metadata are ignored; none are runtime library outputs.
+Protect every root/nested README, SPEC.md, PROMPT.md, tasks.json, scripts/loop.sh,
+all test/support files, config/, mix.exs, .formatter.exs, .gitignore, LICENSE,
+all Stage 1 modules (including cores), plus follower/config/observation/status/
+state public seams. PROGRESS.md and follower_core.ex/new implementation helpers
+remain writable. Inventory must be checked against JSON-decoded grep EREs.
+Private references/evidence stay outside the coder checkout; coder must not read
+outside implementations/references, including sibling repositories. Existing
+.loop attempt state is preserved; new IDs are S2-prefixed and collision-free.
 
-Private helpers, exact arithmetic algorithms and period reduction are local
-freedom only within those seams. Do not add dependencies or change contracts.
-Future follower/config/status/mapping tests, shared Go corpus/encoding, wider
-runtime matrix, release automation, publication and OTP adapters are deferred
-until their affected reviewed kit. No task may assume those decisions.
-
-## Evidence limits and gate
-
-Reference checks establish satisfiability by one local implementation, not
-owner/coder implementation correctness, security, live models, integration,
-performance, a supported runtime matrix or actual device use. Runtime effects
-are also reviewed in the private reference; development tooling itself writes
-_build/. The kit-preparation checkout returned to failing stubs; the current
-checkout contains the runner-committed Stage 1 implementation.
-
-The Stage 1 implementation run has completed once under the README launch gate:
-three first-attempt claude-haiku-5-5 commits (T1, T2, T3) and a passing whole-stage
-T4. No gpt-6.1-sol escalation or STOP occurred. The owner reports a provider-side
-spending cap configured; this is not independently verified. The unchanged runner
-has attempt/time limits but no dollar cap and does not aggregate spending, so total
-spend is unknown. Notes cannot automatically pause it for contract changes; a
-contract blocker must stop the run through the harness and return for review.
-Current gate: author review. No further implementation loop is authorized by this
-document.
+Stage 2 kit preparation/commit only now. STOP for parent review before launch.
+Exact eventual commands/limits and original unchanged $25 constraint are in root
+README; caps are owner-confirmed, not independently verified, total spend unknown.
+No additional model calls, Stage 3, remotes or installs during this preparation.
+Reference/fixture results are not coder implementation, complete parity, live
+integration, performance, security or real-use acceptance. A contract blocker
+must stop the run through the harness; progress notes alone cannot stop retries.

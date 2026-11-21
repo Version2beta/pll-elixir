@@ -10,7 +10,8 @@
     "^mix\\.exs$",
     "^\\.formatter\\.exs$",
     "^\\.gitignore$",
-    "^LICENSE$"
+    "^LICENSE$",
+    "^lib/pll/(follower|follower_config|observation|status|state|rate_core|pacer_core|span_core|segment_core)\\.ex$"
   ],
   "tasks": [
     {
@@ -41,11 +42,38 @@
       "tier": "normal"
     },
     {
-      "id": "T4",
-      "title": "Whole stage: formatting, warnings and every test green",
+      "id": "S2-config",
+      "title": "Configuration validation and shared follower values",
+      "test": "mix test test/pll/follower_config_test.exs --seed 0",
+      "expect": [
+        "^Result: 4 passed$"
+      ],
+      "tier": "normal"
+    },
+    {
+      "id": "S2-mapping",
+      "title": "Anchoring, scalar validation and signed mapping",
+      "test": "mix test test/pll/follower_mapping_test.exs --seed 0",
+      "expect": [
+        "^Result: 4 passed$"
+      ],
+      "tier": "normal"
+    },
+    {
+      "id": "S2-loop",
+      "title": "Inlier equations, lifecycle, unsupported boundary and pacer trim",
+      "test": "mix test test/pll/follower_loop_test.exs --seed 0",
+      "expect": [
+        "^Result: 9 passed$"
+      ],
+      "tier": "normal"
+    },
+    {
+      "id": "S2-tree",
+      "title": "Whole tree: all prior guarantees plus bounded Stage 2",
       "test": "mix format --check-formatted && MIX_ENV=test mix compile --warnings-as-errors && mix test --seed 0",
       "expect": [
-        "^Result: 38 passed$"
+        "^Result: 55 passed$"
       ],
       "tier": "normal"
     }

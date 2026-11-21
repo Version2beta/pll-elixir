@@ -1,12 +1,9 @@
 # pll-elixir — exact pacing and clock following
 
-> **Approved design; Stage 1 exact pacing implemented on `kit/stage1-exact-pacing`.**
-> The kit was prepared with protected seams, tests and intentionally failing stubs.
-> The owner-authorized unchanged runner then committed passing implementations for
-> T1–T3, and T4 passes the whole stage. APIs/examples remain finished-tool promises,
-> not a published port. A private reference was used only for kit feasibility checks.
-> Follower work remains future scope. **Current gate: author review, not another
-> implementation loop.**
+> **Approved design; Stage 1 implemented; Stage 2 verified kit preparation.**
+> Stage 2 delivers failing follower stubs, not an implemented follower. The
+> window/outlier boundary below is temporary until Stage 3. Current gate:
+> parent/author review of the kit, **not coder launch**.
 
 This library helps audio/video, sensor, packet and device-buffer applications
 pace units on their own timeline or learn the relationship to another clock.
@@ -25,22 +22,38 @@ They work separately or together: follower trim can steer a pacer.
 | Approved | Validate all scalar argument types/envelopes left-to-right before semantic checks: Rate.units_per_second(0,U+1) and due(p,-1,U+1) return overflow. This resolves mixed-invalid-input precedence. |
 | Approved | Existing README design: the API, integer envelopes, tagged errors, immutable explicit state transitions, numerical compatibility and library-only scope below. First bounded stage: exact Rate/Pacer/Span; follower contracts are preserved for later kits. |
 | Approved | Retain source MIT licensing/attribution; Stage 1 carries the source LICENSE. Local development version `0.0.0-dev` is not a release. Publication/release metadata requires later review. |
-| Approved | Initialize Git on a non-main branch and commit the verified Stage 1 kit, preserving existing work. Later runner commits of passing attempts and discards of only attempt-owned failed changes are authorized; no remotes, installs, publication or later kits. |
-| Approved | Stage 1 implementation loop authorized: Haiku-5.5 for normal first attempts; gpt-6.1-sol high for the second attempt; gpt-6.1-sol max for the final attempt, using the exact commands below with MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Total budget $25. No remote, installation, follower work or later kit is authorized. |
+| Approved | Initialize Git on a non-main branch and commit the verified Stage 1 kit, preserving existing work. Later runner commits of passing attempts and discards of only attempt-owned failed changes are authorized; no remotes, installs or publication; later kits require separate approval. |
+| Approved | Stage 1 implementation loop authorized: Haiku-5.5 for normal first attempts; gpt-6.1-sol high for the second attempt; gpt-6.1-sol max for the final attempt, using the exact commands below with MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Total budget $25. That Stage 1 authorization did not authorize later kits; Stage 2 preparation is separately approved below. |
 | Approved | Provider-side spending cap: owner-confirmed as configured for this $25 budget. Not independently verified. The unchanged runner does not enforce, track or aggregate dollars; it bounds attempts and time only. |
+| Approved | Stage 2 kit preparation and kit commit only now; eventual runner retains authorized attempt-owned commit/discard permissions and model identities, but requires parent review before launch. No increased $25 budget, installs/remotes/publication/Stage 3 or preparation model calls. |
+| Approved | Temporary Stage 2 unsupported observe boundary described below preserves state for windowed/outlier observations rather than inventing partial window/outlier behavior. Final Stage 3 contract is unchanged. |
 | Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
 | Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and benchmarks; decide before the affected stage. No task may assume them. |
 
-**Current gate: author review.** The Stage 1 exact-pacing implementation loop ran
-once through the unchanged runner, as authorized, and all four tasks pass. Three
-first-attempt coder commits used `claude-haiku-5-5` (T1 `792e3f8`, T2 `7b4603e`,
-T3 `d999aac`). No `gpt-6.1-sol` escalation or `STOP` occurred. Total spend is
-unknown; the owner-confirmed provider-side cap is not independently verified or
-runner-enforced. Return to the author before any next kit. This gate does not
-authorize another implementation loop, model call, follower work, installation,
-remote, publication or later kit. The approved finished-tool design is not itself
-evidence of implementation; the Stage 1 evidence below covers exact Rate/Pacer/Span
-only.
+**Current gate: Stage 2 kit review, before implementation loop.** Stage 1 remains
+implemented. Stage 2 preparation is authorized, including a verified local kit
+commit; no coder/model launch occurs during preparation. A parent review and
+explicit launch authorization are required before the eventual bounded run.
+The original $25 constraint is unchanged; total spend and remaining funds are
+unknown. Provider-side caps are owner-confirmed, not independently verified.
+No installs, remotes, publication, Stage 3 or additional model calls are authorized.
+
+### Temporary Stage 2 execution boundary (approved)
+
+The final follower contract below remains normative for the finished library.
+Stage 2 implements only config, mapping and the inlier loop. It is **not a
+complete follower**. For this stage only, observe returns
+`{:error, %PLL.Error{code: :unsupported, field: nil, reason: nil}}`, with message
+`pll: unsupported in Stage 2`, for every config with `window_ns > 0` (even the
+first anchor), and, for `window_ns == 0`, for subsequent samples whose unrounded
+old-mapping phase error satisfies `abs(e) > outlier_threshold_ns`. Equality is
+an inlier. Wrong state kind raises first, then scalar types/envelopes are
+validated left-to-right, then existing input order is checked, then this boundary
+is applied. A window=0 first reading anchors normally. Unsupported calls retain
+all supplied state, including order and last-accepted time: no pending/rejected
+metadata is consumed. Reset retains config, including this boundary. Stage 3
+will replace this temporary error with the final windows/outliers/steps contract;
+no Stage 2 test or result establishes those deferred behaviors.
 
 **Local implementation freedom:** private helpers, integer
 algorithms and immutable segment sharing within the kit's complete types/seams,
@@ -94,7 +107,7 @@ After implementation, a **proposed local consumer dependency** is:
 
 From the future consumer project, `mix deps.compile pll` would compile that
 local dependency; from this library root, `mix compile` builds the Stage 1 exact
-pacing modules. Follower modules do not exist yet. No installs or fetches are
+pacing modules. Stage 2 follower public seams exist, but the delivered implementation stubs intentionally fail. No installs or fetches are
 authorized. No Hex version/install command is promised; publication availability
 has not been checked. Compiling can write build
 artifacts, but the library runtime has no file effects.
@@ -387,7 +400,10 @@ with integer plus fractional local anchors, avoiding loss solely from uptime.
 
 ### Feeding a sample
 
-Use unrounded binary64 phase error e in ns.
+Use unrounded binary64 phase error e in ns. For phase-domain comparisons,
+convert outlier_threshold_ns and lock_threshold_ns to binary64 (as in the
+pinned Go source); do not use BEAM exact mixed float/integer comparison.
+Input envelopes, order and elapsed duration comparisons remain exact integers.
 
 * If abs(e)>outlier_threshold_ns, it is an outlier. A run continues only when
   abs(e-e_first)<=threshold, comparing with the **first** error in the run;
@@ -524,12 +540,12 @@ processes and write `_build`/compiler caches; format can write sources. Such
 explicit development-tool effects do not contradict the runtime contract.
 The deterministic checks require no network or credentials.
 
-## Deterministic verification contract (Stage 1 checks; follower checks future)
+## Deterministic verification contract (Stage 1 and bounded Stage 2 checks)
 
 Use ExUnit and builtin arithmetic; no added testing dependency. Stage 1
 source-named suites cover Rate, Pacer, Span, an independent rational oracle and
-pacing README examples. FollowerConfig/Follower and shared differential fixtures
-remain future checks. Commands from this project root (Stage 1 suites pass on
+pacing README examples. Stage 2 adds config/mapping/inlier-loop checks; shared Go differential fixtures and
+complete windows/outliers remain deferred. Commands from this project root (Stage 1 suites pass on
 this checkout):
 
 ```sh
@@ -578,7 +594,7 @@ Acceptance must cover:
    agreeing is not independent proof; investigate discrepancies with source
    equations and hand-worked cases.
 
-Approved numerical acceptance (follower verification remains future): exact
+Approved numerical acceptance (full follower verification remains future): exact
 pacer integers, classifications/statuses,
 states, saturation and designated hand-derived boundary mappings. Moderate
 follower-model fixtures mirroring source differential tests allow <=1 ns error
@@ -596,7 +612,7 @@ Prepare **one bounded kit at a time**: protect the
 approved README, use subordinate supporting spec/promise-to-test mapping,
 non-vacuously failing stubs, private passing reference, runner-judge and full
 stage checks. Return for review between kits. Stage 1 is implemented on this
-branch; the next gate is author review, not another loop.
+branch; Stage 2 is a kit only, awaiting review before a loop.
 
 1. **Exact pacing:** Rate/Pacer/Span, error/input envelopes, immutable chaining,
    all pacing examples, independent rational oracle and extreme boundaries.
@@ -617,10 +633,9 @@ implementation, acceptance tests and a subordinate [SPEC.md](SPEC.md). Private-r
 checks during kit preparation established feasibility only. The Stage 1 code was
 written by the runner's coder and judged by the unchanged runner and Mix commands;
 that is not owner, live-model or integration acceptance. There is no completed port,
-installed/published package, follower verification, Go differential corpus,
+installed/published package, complete follower verification, Go differential corpus,
 performance result, live-model trial or real-device validation. Source Go
-results are not port evidence. Author review of the Stage 1 result is the current
-gate before any later kit.
+results are not port evidence. The current gate is review of the Stage 2 kit before any implementation launch.
 
 **Kit-preparation evidence (historical, before the run; Elixir 1.20.4 / OTP 29):**
 unchanged runner `--check` passed all four tasks on the private reference: 9, 21,
@@ -642,7 +657,7 @@ passed the runner's judge without a coder attempt. At implementation commit
 and judge commands on this machine and toolchain. It is not owner acceptance,
 live-model, integration or real-use validation. Total model spend is unknown.
 
-## Stage 1 kit operation (development only, not library API)
+## Historical Stage 1 kit operation (completed; not current launch instructions)
 
 The kit is prepared directly in this checkout on `kit/stage1-exact-pacing`;
 there is no archive to apply and no earlier implementation stage to overlay.
@@ -711,3 +726,59 @@ not aggregate costs or enforce a dollar cap. No model/coder subprocess is invoke
 by kit preparation or `--check`. The completed run made three coder calls, all
 `claude-haiku-5-5` first attempts. Its total spend is unknown from this checkout and
 must be checked against the provider's usage record.
+
+## Stage 2 kit operation (development only, not library API)
+
+Prepared directly on `kit/stage2-mapping-loop`, overlaying the actual Stage 1
+implementation at `049e0ca5a6128954870a59ebcbf25db29a6b294a`; no archive to apply.
+Do not copy private references into this checkout. The kit contains intentionally
+failing follower stubs. Existing `.loop/` logs/attempt metadata are preserved.
+Stage 2 task IDs are S2-prefixed; T1–T3 preserve prior checks and the old T4
+whole-stage task is replaced by the final S2 whole-tree task. All Stage 1 sources,
+all tests, READMEs, config, seams and harness files are protected.
+
+Prerequisites remain Bash/Git/jq/timeout (or gtimeout), installed Elixir/Mix/OTP
+and pi; no installs/fetches. Verification uses Elixir 1.20.4 / OTP 29 only.
+From the checkout, review before launch:
+
+```sh
+git branch --show-current
+git status --short
+mix format --check-formatted
+MIX_ENV=test mix compile --warnings-as-errors
+mix test test/pll/rate_test.exs test/pll/pacer_test.exs test/pll/span_test.exs test/pll/readme_test.exs test/pll/trim_test.exs test/pll/model_test.exs --seed 0
+bash scripts/loop.sh --check
+```
+
+Prior Stage 1 checks pass on delivered stubs (38 tests); new tasks and whole-tree
+check intentionally fail. The private reference overlay onto actual Stage 1
+passes 55 tests and unchanged runner T1–T3/S2-config/S2-mapping/S2-loop/S2-tree.
+Delivered stubs have 39/55 passing tests (16 expected failures); each new task
+fails. Config/mapping/loop reference task counts are 4/4/9. All three alias-based
+public README example fences execute on the reference. Runner bytes match the
+skill source; its 26 disposable regression cases and 26 mutation checks pass.
+These are local feasibility results, not coder implementation, complete follower,
+Go parity, real-device use or a wider runtime matrix. No coder/model was launched.
+
+**STOP here for parent review.** Only after a separate launch authorization,
+from the clean committed non-main kit checkout, the exact eventual command is:
+
+```sh
+MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \
+CHEAP_CMD='pi --provider anthropic --model claude-haiku-5-5 --thinking high --print --no-session' \
+STRONG_CMD='pi --provider openai-codex --model gpt-6.1-sol --thinking high --print --no-session' \
+STRONGEST_CMD='pi --provider openai-codex --model gpt-6.1-sol --thinking max --print --no-session' \
+bash scripts/loop.sh
+```
+
+The runner commits passing attempts and discards only attempt-owned failed work;
+logs, prompts, diffs and attempt state remain in `.loop/`, root `STOP` names an
+exhausted task. Never delete earlier metadata to reset attempts. Progress notes
+are writable but do not automatically halt retries for contract gaps. Commands
+bound time/attempts, not dollars. Original total $25 budget is not expanded;
+provider-side caps are owner-confirmed, not verified, and total spend is unknown.
+No model subprocess is used for preparation, `--check`, or mechanics testing.
+Local freedoms: private arithmetic/helper organization within fixed data/public
+seams; no Stage 1 refactoring or dependencies. Deferred until Stage 3: window,
+outlier, step histories and shared Go fixture encoding/corpus; wider runtime,
+release/publication and adapters need later review. New contract gaps block work.
