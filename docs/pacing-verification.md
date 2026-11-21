@@ -168,3 +168,56 @@ Go's normal run exits 0 without a pass verdict; the criteria above are computed 
 operator from its raw summary. Lateness is oldest unit per wake-up, not per-packet interarrival.
 Accepted-send counts are send acceptance, not receiver receipt; the receiver discards data and
 no loss, jitter, wire bitrate, header overhead, TS validity or device guarantee follows.
+
+## Live result: authorized loop and bounded matrix complete (author review gate)
+
+Loop: `PACING-runner` passed on attempt 1 with `claude-haiku-5-5` at `598a4a2` (Coder-Command
+trailer present); `PACING-tree` passed the judge with no coder attempt. No `gpt-6.1-sol`
+escalation, discard or STOP. Changed by the loop: `scripts/pacing/runner.exs` and `PROGRESS.md`
+only. Checks at `598a4a2`: format (both script trees), warnings-as-errors compile, `mix test
+test/pacing --seed 0` 11/11, `mix test --seed 0` 83/83, `scripts/loop.sh --check` 9/9 pass.
+
+Matrix: all 18 trials ran once, each command exited 0 under `timeout 12`, with no external timeout,
+no stderr, no halt and no retry. Elixir: `MIX_ENV=prod mix run scripts/pacing.exs` after a prod
+compile, reporting `stop: :deadline`. Go: the `pllpace` executable built offline from the
+read-only sibling at `971282632129110794c9d6edd22026e9de2359be`, with `GOPROXY=off GOSUMDB=off
+GOTOOLCHAIN=local GOWORK=off -mod=readonly`, output outside the sibling. The sibling was clean
+before and after. Order alternated per pair as in the protocol. Matrix wall time 117.6 s.
+Raw outputs, commands, exits, timings and Git refs are under ignored `.loop/pacing-comparison/`.
+
+Per config (3 repetitions each; target writer rate 19.392658 Mbps, bound 1%):
+
+| Config | Elixir writer Mbps (min-max) | Elixir backlog ms (min-max) | Elixir oldest-unit p99 ms (max) | Go writer Mbps (min-max) | Go backlog ms (max) | Go oldest-unit p99 ms (max) | Pass |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| discard | 19.3851-19.3853 | 1.901-1.939 | 2.045 | 19.3929 | 0.000 | 0.020 | 3/3 each |
+| UDP loopback group 1 | 19.3858-19.3876 | 1.301-1.771 | 1.943 | 19.3926-19.3929 | 0.022 | 0.028 | 3/3 each |
+| UDP loopback group 7 | 19.3852-19.3920 | 0.175-1.927 | 1.985 | 19.3929 | 0.000 | 0.022 | 3/3 each |
+
+Every trial passed all approved criteria: nonempty; accepted bytes exactly 188 * offered; no error,
+cap, cancel or guard stop (Go: exit 0); backlog <= 5 ms; oldest-unit p99 <= 5 ms; writer Mbps
+within 1% of target. Elixir writer deviation was 0.004-0.039%; Go was 0.001%. Go's 1% check used
+exact printed byte counts and printed elapsed (ms precision), because Go prints no raw elapsed ns.
+No threshold was tuned.
+
+Observed lateness (oldest unit per wake-up, not per packet): Elixir median ranged 0.19-1.96 ms and
+due calls 2,596-8,352 with 7.7-24.8 units per call, because it waits in whole milliseconds and
+drains batches. Its maximum reached 7.08 ms in one group-1 trial (rep 2), above the 5 ms bound
+on maximum lateness but not a pass criterion. Go woke about 64,400 times per trial with median
+11-12 us and p99 16-28 us. These are different schedulers, not one identical per-packet metric.
+
+Limitations and boundaries:
+
+- Same machine, not a controlled idle system. Other local sessions were active; 1-minute load was
+  4.10 at matrix start and 2.98 at end (10 schedulers). Ambient load is a comparison limitation;
+  its contribution to the Elixir spread is not isolated.
+- Three repetitions per config, one machine, one short run each. No speed ratio, no universal or
+  hardware-independent claim.
+- Writer-accepted bytes are send acceptance only. The receiver discards data; there is no receipt,
+  loss, jitter-at-receiver, wire bitrate, header overhead, device or valid MPEG-TS guarantee.
+- Payloads are zero-filled timing bytes, not MPEG-TS. Discard runs send nothing to a network.
+- No ticker mode, find-max, remote UDP, or flag parity beyond the approved pacer demonstration.
+- Spend: one coder call (Haiku attempt 1); no gpt-6.1-sol call. Total spend is unknown; the
+  original $25 total is not expanded and provider caps are owner-confirmed, not independently verified.
+
+Gate: the authorized loop and matrix are complete. No further loop, trial, model call or threshold
+change is authorized; the outcome is for author review.

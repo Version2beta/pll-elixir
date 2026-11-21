@@ -258,3 +258,9 @@ caps owner-confirmed, not verified; spend unknown. No further loop or model call
 PACING-runner: scripts/pacing/runner.exs implements Runner.run/2 over public Rate/Pacer/Span through injected now/wait/cancelled/write/progress seams; validation precedes every io call; each Pacer state is retained only as the immutable successor value.
 Changes/evidence: only scripts/pacing/runner.exs changed (private helpers inside the file; run/2 signature, @doc and @spec kept). mix test test/pacing --seed 0: 11 passed (stub was 2/11). mix test test/pll test/bench --seed 0: 72 passed. mix test --seed 0: 83 passed. mix format --check-formatted and the scripts format check pass; MIX_ENV=test mix compile --warnings-as-errors printed no warnings. Covered by fake-clock tests only: slot zero, 4096 cap, coarse waits, deadline flush, write/short-write accounting, cancel, cap, and invalid options before effects. No network, UDP, live waits, installs, or loop/judge commands were run.
 Remaining/blocker: no live 5-second or UDP trial was run (not authorized during coding); wall-clock accuracy and loopback behavior are unproven. For review, not blocking: pacer errors (unreachable under validated bounds and nonnegative clock) return {:error, {:pacer, code}}, which the SPEC does not name; scripts/loop.sh --check was not run (it contains the judge's discard path).
+
+# Pacing live result (author review gate; no further loop or trial)
+PACING-runner passed attempt 1 with claude-haiku-5-5 at 598a4a2; PACING-tree passed the judge with no coder attempt.
+Post-loop checks: format, warnings-as-errors compile, pacing 11/11, whole tree 83/83, loop --check 9/9.
+Bounded matrix: 18 trials, all exit 0, all passing approved criteria; per-trial raw evidence is ignored in .loop/pacing-comparison/.
+Limitations: same-machine ambient load, zero-filled payloads, send acceptance only (no receipt), Elixir lateness coarser than Go. No further loop or trial authorized.
