@@ -13,3 +13,6 @@ No follower or later-kit work is authorized.
 T1: Implemented PLL.RateCore factories in lib/pll/rate_core.ex: per-scalar type then uint64 envelope checks (left-to-right), zero-term invalid_rate, gcd reduction, bits_per_second, and exact to_string spelling with ArgumentError for wrong kinds.
 T1 evidence: test/pll/rate_test.exs 9/9 passed (seed 0); mix format --check-formatted and MIX_ENV=test mix compile --warnings-as-errors passed; whole suite now 9/38 (remaining failures are unimplemented T2-T4 Pacer/Span/trim work). Only lib/pll/rate_core.ex changed.
 T1 blockers: none found; no contract gap; no private reference or external implementation was consulted, and the Go source was not read.
+T2: Pacer and Span untrimmed issuance, bounds, lazy snapshots and README examples implemented.
+T2 changed: lib/pll/pacer_core.ex, lib/pll/span_core.ex and new private lib/pll/segment_core.ex. Evidence: task test 21/21 passed (seed 0); mix format --check-formatted and MIX_ENV=test mix compile --warnings-as-errors passed; full suite 30/38 (rate 9/9 and the T2 files pass; the 8 failures are trim_test/model_test, T3).
+T2 remaining/blocks: valid nonzero set_trim is not implemented and still returns invalid_argument (T3 must replace it); no new contract gap found; no private reference or external implementation consulted; Go source not read.
