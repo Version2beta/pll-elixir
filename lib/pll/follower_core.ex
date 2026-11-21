@@ -1,8 +1,8 @@
 defmodule PLL.FollowerCore do
   @moduledoc false
   # Stage 2 follower core. S2-config: new/1. S2-mapping: anchoring, scalar
-  # validation, signed mapping and state/getter queries. S2-loop (not yet done):
-  # observe for later readings (order, inlier feed, window/outlier boundary).
+  # validation, signed mapping and state/getter queries. S2-loop: later readings
+  # (order, temporary unsupported boundary, inlier feed, lock and jitter).
 
   # README signed 64-bit envelope for integer config fields.
   @imin -9_223_372_036_854_775_808
@@ -142,9 +142,109 @@ defmodule PLL.FollowerCore do
     end
   end
 
-  # Placeholder: later readings (order, inlier feed) are S2-loop work, not implemented here.
-  defp observe_valid(%PLL.Follower{}, _local_ns, _remote),
-    do: {:error, %PLL.Error{code: :not_anchored}}
+  # Later readings: order is checked first, then the Stage 2 boundary, then the feed.
+  defp observe_valid(%PLL.Follower{} = follower, local_ns, remote) do
+    if local_ns < follower.last_local or remote <= follower.last_remote do
+      {:error, %PLL.Error{code: :order}}
+    else
+      observe_later(follower, local_ns, remote)
+    end
+  end
+
+  # Windows are unsupported in Stage 2 for every later reading.
+  defp observe_later(%PLL.Follower{config: %{window_ns: window}}, _local_ns, _remote)
+       when window > 0,
+       do: {:error, %PLL.Error{code: :unsupported}}
+
+  # Unrounded old-mapping phase error decides the temporary outlier boundary.
+  defp observe_later(%PLL.Follower{} = follower, local_ns, remote) do
+    e = phase_error(follower, local_ns, remote)
+
+    if abs(e) > :erlang.float(follower.config.outlier_threshold_ns) do
+      {:error, %PLL.Error{code: :unsupported}}
+    else
+      feed_inlier(follower, local_ns, remote, e)
+    end
+  end
+
+  # Accepted inlier: update the mapping (only when dt > 0), then lock and jitter data.
+  defp feed_inlier(%PLL.Follower{} = follower, local_ns, remote, e) do
+    with {:ok, mapped} <- update_mapping(follower, local_ns, remote, e) do
+      lock_threshold = :erlang.float(follower.config.lock_threshold_ns)
+
+      lock_run =
+        if abs(e) <= lock_threshold,
+          do: min(follower.lock_run + 1, follower.config.lock_count),
+          else: 0
+
+      next = %{
+        mapped
+        | last_local: local_ns,
+          last_remote: remote,
+          last_accepted: local_ns,
+          lock_run: lock_run
+      }
+
+      observation = %PLL.Observation{
+        status: :accepted,
+        error_ns: saturate(round(e), @imin, @imax)
+      }
+
+      {:ok, update_jitter(next, e), observation}
+    end
+  end
+
+  # dt = 0 leaves mapping, rate and reference unchanged.
+  defp update_mapping(%PLL.Follower{reference: reference} = follower, local_ns, _remote, _e)
+       when local_ns == reference,
+       do: {:ok, follower}
+
+  # Gains and the offset update use the old mapping; the anchor moves by rounded displacement.
+  defp update_mapping(%PLL.Follower{} = follower, local_ns, remote, e) do
+    dt = (local_ns - follower.reference) / 1.0e9
+    x = capped_x(follower.config.bandwidth_hz, dt)
+    kp = capped_gain(follower.config.damping, x)
+    limit = follower.config.max_offset_ppm * 1.0e-6
+    y = min(max(follower.y - x * x / dt * (e / 1.0e9), -limit), limit)
+    v = predicted_displacement(follower, remote) + kp * e
+    whole = round(v)
+
+    with {:ok, i0} <- fit_int64(follower.i0 + whole) do
+      {:ok, %{follower | i0: i0, frac: v - whole, r0: remote, y: y, reference: local_ns}}
+    end
+  end
+
+  # Jitter: first accepted inlier sets m = e*e; later ones use m += (e*e - m)/16.
+  defp update_jitter(%PLL.Follower{jitter_count: 0} = follower, e),
+    do: %{follower | jitter_count: 1, jitter_m: e * e}
+
+  defp update_jitter(%PLL.Follower{} = follower, e),
+    do: %{
+      follower
+      | jitter_count: 2,
+        jitter_m: follower.jitter_m + (e * e - follower.jitter_m) / 16
+    }
+
+  # Phase error e = local - predicted(remote), unrounded, in binary64 ns.
+  defp phase_error(%PLL.Follower{} = follower, local_ns, remote),
+    do: wide_diff(local_ns, follower.i0) - predicted_displacement(follower, remote)
+
+  # frac + (remote - R0) * Pn / (1 + y), the displacement from I0 under the current mapping.
+  defp predicted_displacement(%PLL.Follower{} = follower, remote),
+    do: follower.frac + wide_diff(remote, follower.r0) * period(follower) / (1 + follower.y)
+
+  # min(0.5, 2*pi*bandwidth*dt), testing the cap before the product can overflow.
+  defp capped_x(bandwidth, dt) do
+    if bandwidth >= 0.5 / (2 * :math.pi() * dt),
+      do: 0.5,
+      else: 2 * :math.pi() * bandwidth * dt
+  end
+
+  # min(1, 2 * (damping * x)) without forming an overflowing product.
+  defp capped_gain(damping, x) do
+    p = damping * x
+    if p >= 0.5, do: 1.0, else: 2 * p
+  end
 
   defp anchor(%PLL.Follower{} = follower, local_ns, remote) do
     %{
