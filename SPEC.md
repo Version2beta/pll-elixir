@@ -93,11 +93,12 @@ Private references/evidence stay outside the coder checkout; coder must not read
 outside implementations/references, including sibling repositories. Existing
 .loop attempt state is preserved; new IDs are S2-prefixed and collision-free.
 
-Parent review of this kit is complete. The authorized Stage 2 implementation run
-uses the exact commands and limits in root README; the original $25 constraint is
-unchanged and not expanded. Caps are owner-confirmed, not independently verified;
-total spend is unknown. Model calls are limited to authorized runner attempts; no
-Stage 3, remotes, installs or later kits are authorized.
+Parent review of this kit is complete. The authorized Stage 2 run completed once
+(exit 0): S2-config, S2-mapping and S2-loop each passed on a first claude-haiku-5-5
+attempt, and S2-tree passed the judge without a coder attempt. The original $25
+constraint is unchanged and not expanded. Caps are owner-confirmed, not independently
+verified; total spend is unknown. No further loop, Stage 3, remotes, installs or
+later kits are authorized.
 Reference/fixture results are not coder implementation, complete parity, live
 integration, performance, security or real-use acceptance. A contract blocker
 must stop the run through the harness; progress notes alone cannot stop retries.

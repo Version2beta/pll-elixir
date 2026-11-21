@@ -51,7 +51,7 @@ Reference verification used a separate temporary overlay on actual Stage 1;
 owner checkout implementation stubs were never replaced. That preparation ended at its
 parent launch gate; no coder/model calls or Stage 3 work were performed then.
 
-# Stage 2 parent review and run authorization (current)
+# Stage 2 parent review and run authorization
 Parent review of the Stage 2 kit (kit commit 67813b6) is complete. The owner authorized
 the Stage 2 implementation run with the root README command: claude-haiku-5-5 for normal
 attempts, gpt-6.1-sol high for the second attempt, gpt-6.1-sol max for the final attempt,
@@ -60,6 +60,18 @@ discard permissions continue for attempt-owned changes only. The original $25 bu
 not expanded; caps are owner-confirmed, not independently verified; total spend is unknown.
 The run had not started when this checkpoint was committed. The temporary :unsupported
 boundary is unchanged until Stage 3. Stage 3 and later kits remain unauthorized.
+
+# Stage 2 run result (current; author review gate)
+The authorized runner exited 0 after `every task passes` (raw output and exit code in
+ignored .loop/stage2.run.out and .loop/stage2.exit). Each task passed on attempt 1 with
+claude-haiku-5-5: S2-config cd8b3ea, S2-mapping b1e9249, S2-loop ec3aa37. S2-tree passed
+the runner judge without a coder attempt. No gpt-6.1-sol escalation, no STOP, and no
+attempt was discarded. Runner changes since the docs commit 6c3a590 were limited to
+lib/pll/follower_core.ex and PROGRESS.md. Final checks: format check passed; warnings-as-errors compile passed;
+`mix test --seed 0` reported 55 passed; `bash scripts/loop.sh --check` passed all seven
+tasks. Stage 2 is limited: windows, outliers, steps, Go parity and the complete follower
+remain unimplemented, and the temporary :unsupported boundary remains. Total spend is unknown;
+the run made three coder calls. No further loop is authorized.
 S2-config: Implemented PLL.FollowerCore.new/1 in lib/pll/follower_core.ex: table-order type, envelope and semantic checks (nominal must be a valid reduced-uint64 Rate; float fields must be floats; signed 64-bit integer envelopes return overflow); a wrong config kind raises ArgumentError; success returns {:ok, %PLL.Follower{config: config}} unanchored. Evidence: test/pll/follower_config_test.exs 4/4 passed (seed 0); mix format --check-formatted and MIX_ENV=test mix compile --warnings-as-errors --force passed; Stage 1 suites 38/38 passed; whole tree 42/55 with 13 failures remaining.
 S2-config changed only lib/pll/follower_core.ex (new/1 and private validation helpers; other follower stubs untouched); no protected file, test or dependency changed; no private reference, external implementation or Go source consulted; no new contract gap found.
 S2-config remaining: observe/local/remote/offset/trim/jitter/state/reset stay stubs for S2-mapping and S2-loop; nonfinite float rejection is not separately exercisable on BEAM, so only the type/semantic checks apply; no blocker.

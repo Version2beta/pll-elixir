@@ -1,10 +1,9 @@
 # pll-elixir — exact pacing and clock following
 
-> **Approved design; Stage 1 implemented; Stage 2 kit parent-reviewed; Stage 2 implementation run authorized.**
-> Until the authorized run commits passing attempts, the checked-in Stage 2 follower
-> is failing stubs, not an implemented follower. The window/outlier boundary below
-> is temporary until Stage 3. Current gate: the authorized bounded Stage 2 run
-> (exact command in the Stage 2 kit operation section); no Stage 3 or later kit is authorized.
+> **Approved design; Stage 1 implemented; Stage 2 config, mapping and inlier loop implemented by the authorized bounded run.**
+> The Stage 2 follower is limited, not complete: the window/outlier boundary below
+> is temporary until Stage 3, and windows, outliers and steps are not implemented.
+> Current gate: author review of the completed Stage 2 run; no further loop, Stage 3 or later kit is authorized.
 
 This library helps audio/video, sensor, packet and device-buffer applications
 pace units on their own timeline or learn the relationship to another clock.
@@ -33,13 +32,15 @@ They work separately or together: follower trim can steer a pacer.
 | Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
 | Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and benchmarks; decide before the affected stage. No task may assume them. |
 
-**Current gate: authorized Stage 2 implementation run.** Stage 1 remains
-implemented. Parent review of the Stage 2 kit is complete, and the owner has
-authorized the bounded run in the Stage 2 kit operation section. That run had not
-started when this status was committed. The original $25 constraint is unchanged
-and not expanded; total spend and remaining funds are unknown. Provider-side caps
-are owner-confirmed, not independently verified. No installs, remotes, publication,
-Stage 3, later kits, or model calls beyond the authorized runner attempts are authorized.
+**Current gate: author review of the completed Stage 2 run.** Stage 1 remains
+implemented. The authorized Stage 2 runner exited 0 after `every task passes`:
+S2-config, S2-mapping and S2-loop each passed on the first `claude-haiku-5-5`
+attempt, and the S2-tree whole-tree judge passed with no coder attempt. No
+`gpt-6.1-sol` escalation or `STOP` occurred. No further loop is authorized. The
+original $25 constraint is unchanged and not expanded. Provider-side caps are
+owner-confirmed, not independently verified; the runner does not track dollars, and
+total spend and remaining funds are unknown. No installs, remotes, publication,
+Stage 3 or later kits are authorized.
 
 ### Temporary Stage 2 execution boundary (approved)
 
@@ -110,7 +111,7 @@ After implementation, a **proposed local consumer dependency** is:
 
 From the future consumer project, `mix deps.compile pll` would compile that
 local dependency; from this library root, `mix compile` builds the Stage 1 exact
-pacing modules. Stage 2 follower public seams exist, but the delivered implementation stubs intentionally fail. No installs or fetches are
+pacing modules. Stage 2 config, mapping and inlier-loop seams are implemented (Stage 2-limited); windows, outliers and steps return the temporary unsupported error until Stage 3. No installs or fetches are
 authorized. No Hex version/install command is promised; publication availability
 has not been checked. Compiling can write build
 artifacts, but the library runtime has no file effects.
@@ -615,7 +616,7 @@ Prepare **one bounded kit at a time**: protect the
 approved README, use subordinate supporting spec/promise-to-test mapping,
 non-vacuously failing stubs, private passing reference, runner-judge and full
 stage checks. Return for review between kits. Stage 1 is implemented on this
-branch; Stage 2 has a parent-reviewed kit whose bounded implementation run is authorized but not yet run at this status.
+branch; Stage 2 config, mapping and inlier loop are implemented under the completed bounded run, with window/outlier behavior still temporary.
 
 1. **Exact pacing:** Rate/Pacer/Span, error/input envelopes, immutable chaining,
    all pacing examples, independent rational oracle and extreme boundaries.
@@ -638,7 +639,7 @@ written by the runner's coder and judged by the unchanged runner and Mix command
 that is not owner, live-model or integration acceptance. There is no completed port,
 installed/published package, complete follower verification, Go differential corpus,
 performance result, live-model trial or real-device validation. Source Go
-results are not port evidence. The current gate is the authorized Stage 2 implementation run and its review; no Stage 3 is authorized.
+results are not port evidence. The current gate is author review of the completed Stage 2 run; no Stage 3 is authorized.
 
 **Kit-preparation evidence (historical, before the run; Elixir 1.20.4 / OTP 29):**
 unchanged runner `--check` passed all four tasks on the private reference: 9, 21,
@@ -659,6 +660,21 @@ passed the runner's judge without a coder attempt. At implementation commit
 `bash scripts/loop.sh --check` passed T1–T4. This verifies only the Stage 1 suite
 and judge commands on this machine and toolchain. It is not owner acceptance,
 live-model, integration or real-use validation. Total model spend is unknown.
+
+**Owner-checkout Stage 2 implementation evidence (current, Stage 2-limited):** the
+authorized runner's coder made three first-attempt commits with `claude-haiku-5-5`:
+S2-config `cd8b3ea`, S2-mapping `b1e9249` and S2-loop `ec3aa37`, each with a
+`Coder-Command:` trailer for the Haiku command. The S2-tree whole-tree task then passed
+the judge without a coder attempt. Across the run the runner changed only
+`lib/pll/follower_core.ex` and `PROGRESS.md`; no README, SPEC, test, support, config,
+task or runner path changed. Final checks: `mix format --check-formatted` passed;
+`MIX_ENV=test mix compile --warnings-as-errors` passed; `mix test --seed 0` reported 55
+passed (follower_config 4, follower_mapping 4, follower_loop 9); `bash scripts/loop.sh
+--check` passed T1, T2, T3, S2-config, S2-mapping, S2-loop and S2-tree. This is local
+evidence for the Stage 2 config, mapping and inlier loop only. Windows, outliers, steps,
+the Go parity corpus and the complete follower are not implemented; the temporary
+`:unsupported` boundary remains. This is not owner acceptance, live-model, integration
+or real-use validation. Three coder calls were made; total model spend is unknown.
 
 ## Historical Stage 1 kit operation (completed; not current launch instructions)
 
@@ -742,10 +758,10 @@ all tests, READMEs, config, seams and harness files are protected.
 
 Prerequisites remain Bash/Git/jq/timeout (or gtimeout), installed Elixir/Mix/OTP
 and pi; no installs/fetches. Verification uses Elixir 1.20.4 / OTP 29 only.
-Launch-time prerequisite check (before this status commit): pi 1.6.0, jq 1.7.1,
+Launch-time prerequisite check (before the run): pi 1.6.0, jq 1.7.1,
 `/usr/bin/timeout`, Bash 3.2, Git 2.54, Mix 1.20.4 / OTP 29; the runner copy matches
 the skill source byte-for-byte.
-From the checkout, review before launch:
+Review commands from the checkout (no model calls):
 
 ```sh
 git branch --show-current
@@ -756,8 +772,8 @@ mix test test/pll/rate_test.exs test/pll/pacer_test.exs test/pll/span_test.exs t
 bash scripts/loop.sh --check
 ```
 
-Prior Stage 1 checks pass on delivered stubs (38 tests); new tasks and whole-tree
-check intentionally fail. The private reference overlay onto actual Stage 1
+Kit-preparation evidence (historical, before the run): prior Stage 1 checks pass on
+delivered stubs (38 tests); new tasks and whole-tree check intentionally fail. The private reference overlay onto actual Stage 1
 passes 55 tests and unchanged runner T1–T3/S2-config/S2-mapping/S2-loop/S2-tree.
 Delivered stubs have 39/55 passing tests (16 expected failures); each new task
 fails. Config/mapping/loop reference task counts are 4/4/9. All three alias-based
@@ -773,8 +789,9 @@ skill source; its 26 disposable regression cases and 26 mutation checks pass.
 These are local feasibility results, not coder implementation, complete follower,
 Go parity, real-device use or a wider runtime matrix. No coder/model was launched.
 
-**Parent review complete; run authorized.** From the clean committed non-main kit
-checkout, the authorized command is:
+**Stage 2 run completed once (exit 0); not authorized again.** The authorized command
+was run from the clean committed non-main kit checkout; its output and exit code were
+recorded in ignored `.loop/stage2.run.out` and `.loop/stage2.exit`:
 
 ```sh
 MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \
