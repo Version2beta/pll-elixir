@@ -1,10 +1,12 @@
 # pll-elixir — exact pacing and clock following
 
-> **Approved design / Stage 1 kit, not implemented.** The exact-pacing kit
-> supplies protected seams, tests and intentionally failing implementation stubs.
+> **Approved design / Stage 1 kit.** The exact-pacing kit supplies protected
+> seams, tests and intentionally failing implementation stubs. Independent source
+> review found no code or test blockers. Stage 1 implementation is governed by the
+> launch gate below; its completion is established only by the runner's result.
 > APIs/examples remain finished-tool promises, not a published port. Only a
-> private reference is used for kit feasibility checks. Stop for parent review
-> before launching an implementation runner; follower work remains future scope.
+> private reference is used for kit feasibility checks. Follower work remains
+> future scope.
 
 This library helps audio/video, sensor, packet and device-buffer applications
 pace units on their own timeline or learn the relationship to another clock.
@@ -24,14 +26,18 @@ They work separately or together: follower trim can steer a pacer.
 | Approved | Existing README design: the API, integer envelopes, tagged errors, immutable explicit state transitions, numerical compatibility and library-only scope below. First bounded stage: exact Rate/Pacer/Span; follower contracts are preserved for later kits. |
 | Approved | Retain source MIT licensing/attribution; Stage 1 carries the source LICENSE. Local development version `0.0.0-dev` is not a release. Publication/release metadata requires later review. |
 | Approved | Initialize Git on a non-main branch and commit the verified Stage 1 kit, preserving existing work. Later runner commits of passing attempts and discards of only attempt-owned failed changes are authorized; no remotes, installs, publication or later kits. |
-| Approved, launch withheld | Haiku-5.5 for most work; gpt-6.1-sol high/max escalation using the exact commands below; total budget $25. Preparation stops before any coder/model subprocess launch. Parent review and budget resolution precede execution. |
-| Deferred — before any paid launch | Aggregate spending/current remaining budget and hard enforcement are unverified. Unchanged runner has no dollar cap; do not promise $25 enforcement. Preparation itself consumes delegated model budget; no extra model fanout is authorized. |
+| Approved | Stage 1 implementation loop authorized: Haiku-5.5 for normal first attempts; gpt-6.1-sol high for the second attempt; gpt-6.1-sol max for the final attempt, using the exact commands below with MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Total budget $25. No remote, installation, follower work or later kit is authorized. |
+| Approved | Provider-side spending cap: owner-confirmed as configured for this $25 budget. Not independently verified. The unchanged runner does not enforce, track or aggregate dollars; it bounds attempts and time only. |
+| Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
 | Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and benchmarks; decide before the affected stage. No task may assume them. |
 
-**Current gate:** prepare and locally verify only the Stage 1 exact-pacing kit,
-then return for parent review. No actual implementation runner launch, follower
-implementation, installation, remote or publication action is part of this gate.
-The approved finished-tool design is not evidence that its stubs implement it.
+**Current gate:** the Stage 1 exact-pacing implementation loop is authorized for
+one run through the unchanged runner, under the launch settings below. Independent
+source review of the kit found no code or test blockers. Stop and return for
+author review at Stage 1 completion or any contract blocker. No follower
+implementation, installation, remote or publication action, or later kit is part
+of this gate. The approved finished-tool design is not evidence that its stubs
+implement it.
 
 **Local implementation freedom:** private helpers, integer
 algorithms and immutable segment sharing within the kit's complete types/seams,
@@ -607,7 +613,8 @@ tests and a subordinate [SPEC.md](SPEC.md). Private-reference checks establish
 local feasibility only, not a coder implementation. There is no completed port,
 installed/published package, follower verification, Go differential corpus,
 performance result, live-model trial or real-device validation. Source Go
-results are not port evidence. Review the preparation evidence before launch.
+results are not port evidence. Review the preparation evidence and the Stage 1
+run result before any later kit.
 
 **Local kit evidence (Elixir 1.20.4 / OTP 29):** unchanged runner `--check`
 passes all four tasks on the private reference: 9, 21, 8 and 38 tests respectively,
@@ -630,7 +637,7 @@ stubs intentionally, not the reference. Existing README work and transient
 Git. No source files may be hidden to satisfy the runner's clean-start gate.
 
 Prerequisites: Bash, Git, jq, a working `timeout` or `gtimeout`, Elixir/Mix/OTP,
-and installed `pi` for a later paid run. Local preparation checked Bash 3.2,
+and installed `pi` for the authorized paid run. Local preparation checked Bash 3.2,
 Git 2.54, jq 1.7, timeout smoke behavior, Elixir 1.20.4 / OTP 29 and pi 1.5.2.
 No dependency install/fetch is needed. Tests use no live clocks, network or
 credentials. Commands below write ignored development artifacts, not runtime I/O.
@@ -651,10 +658,13 @@ whole-stage tests. Task stdout uses the exact installed ExUnit summary format;
 a different runtime requires kit re-verification, not loose pass markers.
 There are no prior-stage checks. See SPEC for promise-to-test mapping.
 
-**Do not launch yet.** Parent review and spending resolution are required.
-Once released at that gate, the exact next implementation command is:
+**Authorized Stage 1 launch.** Independent source review found no code or test
+blockers. The owner authorized this bounded run with a $25 total budget and
+confirmed a provider-side cap is configured. Run exactly this command from the
+kit checkout:
 
 ```sh
+MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \
 CHEAP_CMD='pi --provider anthropic --model claude-haiku-5-5 --thinking high --print --no-session' \
 STRONG_CMD='pi --provider openai-codex --model gpt-6.1-sol --thinking high --print --no-session' \
 STRONGEST_CMD='pi --provider openai-codex --model gpt-6.1-sol --thinking max --print --no-session' \
@@ -670,12 +680,14 @@ task exhausting retries. PROGRESS.md is writable; approved READMEs, supporting
 contracts, complete seams, tests and kit files are protected. Newly discovered
 contract gaps require review; progress notes do not automatically halt retries.
 
-Limits default to MAX_ITER=60, MAX_ATTEMPTS=4, ITER_SECONDS=1200 and
-JUDGE_TIMEOUT=300; positive-integer owner overrides only. These bound attempts
-and time, **not spending**. The total authorized budget is $25, including model
-preparation work; no reliable remaining amount has been established. Pi's local
-usage estimates are not a verified aggregate/provider billing ledger. Exact
-`--print --no-session` commands do not persist session usage, the runner does
-not aggregate costs, and provider-side enforcement is unverified. Do not launch
-or claim a hard cap until the parent resolves this limitation. No model/coder
-subprocess is invoked by kit preparation or `--check`.
+Launch limits are MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and
+JUDGE_TIMEOUT=300 (runner defaults 60, 4, 1200 and 300; positive-integer owner
+overrides only). With three attempts a normal task uses Haiku-5.5, then
+gpt-6.1-sol high, then gpt-6.1-sol max. These bound attempts and time, **not
+spending**. The total authorized budget is $25, including model preparation work;
+no reliable remaining amount has been independently verified. The owner reports a
+provider-side spending cap configured; this is not independently verified. Pi's
+local usage estimates are not a verified aggregate/provider billing ledger. Exact
+`--print --no-session` commands do not persist session usage, and the runner does
+not aggregate costs or enforce a dollar cap. No model/coder subprocess is invoked
+by kit preparation or `--check`.

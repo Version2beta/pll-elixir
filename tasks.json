@@ -5,6 +5,7 @@
   "protected": [
     "(^|/)README\\.md$",
     "^test/",
+    "^config/",
     "^lib/pll/(error|segment|rate|pacer|span)\\.ex$",
     "^mix\\.exs$",
     "^\\.formatter\\.exs$",

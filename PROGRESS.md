@@ -6,5 +6,7 @@ Both pacing README fences passed on that reference. Every task fails delivered
 stubs; whole-stage stubs: 1/38 passed, 37 failures. No coder attempts have run.
 
 Owner clarified: validate all scalar types/envelopes left-to-right, then semantics.
-Parent review and resolution of aggregate $25 accounting/enforcement are required
-before a paid implementation run. No follower or later-kit work is authorized.
+Independent source review found no code/test blockers. The owner authorized the
+Stage 1 paid implementation run: $25 total budget; a provider-side cap is reported
+configured by the owner (not independently verified, not runner-enforced).
+No follower or later-kit work is authorized.

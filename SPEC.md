@@ -70,8 +70,8 @@ than weakening expectations. No test is skipped/excluded.
 
 Protected inventory: root README.md (and any nested approved README), SPEC.md,
 PROMPT.md, tasks.json, scripts/loop.sh, .gitignore, .formatter.exs, mix.exs,
-LICENSE, every test/support file, and complete lib/pll/{error,segment,rate,pacer,
-span}.ex. PROGRESS.md and core stubs are intentionally writable. No private
+LICENSE, any config/ directory, every test/support file, and complete
+lib/pll/{error,segment,rate,pacer,span}.ex. PROGRESS.md and core stubs are intentionally writable. No private
 reference belongs in this repository. .loop/, _build/ and existing transient
 .wtha/ metadata are ignored; none are runtime library outputs.
 
@@ -89,7 +89,11 @@ performance, a supported runtime matrix or actual device use. Runtime effects
 are also reviewed in the private reference; development tooling itself writes
 _build/. The final checkout intentionally returns to failing stubs.
 
-No actual implementation loop may launch during preparation. Parent review
-and resolution of the unverified aggregate $25 spending accounting/enforcement
-are launch prerequisites. The unchanged runner has attempt/time limits but no
-dollar cap. Notes cannot automatically pause it for contract changes.
+The Stage 1 implementation loop may run only under the owner's authorization in
+the README launch gate: Haiku-5.5 normal attempts with gpt-6.1-sol escalation and
+a $25 total budget. Independent source review of this kit found no code or test
+blockers. The owner reports a provider-side spending cap configured; this is not
+independently verified. The unchanged runner has attempt/time limits but no
+dollar cap and does not aggregate spending. Notes cannot automatically pause it
+for contract changes; a contract blocker must stop the run through the harness
+and return for review.
