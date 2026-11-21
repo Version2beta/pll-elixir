@@ -130,3 +130,6 @@ JUDGE_TIMEOUT=300. Runner commit/discard permissions apply only to passing attem
 attempt-owned failures. The original $25 total is not expanded; provider caps are
 owner-confirmed, not independently verified; spend is unknown. This gate update changes
 no normative API, SPEC or test contract. The run had not started at this checkpoint.
+S3-history: implemented final window candidates, strict-smaller signed tie rule, flush-then-trigger windows, first-error outlier runs, exact re-anchoring steps and transactional rollback in lib/pll/follower_history.ex only (private window %{start,local,remote,error} and outlier %{first,count} state; reuses FollowerCore history_error/3 and history_inlier/4).
+S3-history evidence: task command 20/20 passed; mix format --check-formatted, MIX_ENV=test mix compile --warnings-as-errors and mix test --seed 0 66/66 passed; a scratch 300x300 random ordered run (not kept) raised no exceptions. No protected file, dependency, private reference or external implementation was read or changed; no new contract gap found.
+S3-history remaining/blocks: none for this task. Not committed or marked done; the runner judges. Corpus and synthetic passes are finite fixture evidence, not universal cross-language parity.
