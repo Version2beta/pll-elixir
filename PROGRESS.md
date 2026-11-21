@@ -133,3 +133,14 @@ no normative API, SPEC or test contract. The run had not started at this checkpo
 S3-history: implemented final window candidates, strict-smaller signed tie rule, flush-then-trigger windows, first-error outlier runs, exact re-anchoring steps and transactional rollback in lib/pll/follower_history.ex only (private window %{start,local,remote,error} and outlier %{first,count} state; reuses FollowerCore history_error/3 and history_inlier/4).
 S3-history evidence: task command 20/20 passed; mix format --check-formatted, MIX_ENV=test mix compile --warnings-as-errors and mix test --seed 0 66/66 passed; a scratch 300x300 random ordered run (not kept) raised no exceptions. No protected file, dependency, private reference or external implementation was read or changed; no new contract gap found.
 S3-history remaining/blocks: none for this task. Not committed or marked done; the runner judges. Corpus and synthetic passes are finite fixture evidence, not universal cross-language parity.
+
+# Stage 3 run result (current; author review gate)
+The single authorized runner run exited 0 after `every task passes` (raw output and exit code
+in ignored .loop/stage3.run.out and .loop/stage3.exit). S3-history passed on attempt 1 with
+claude-haiku-5-5 at 89a1a81; S3-tree passed the judge without a coder attempt. No
+gpt-6.1-sol escalation, discard or STOP. Changed by the run: lib/pll/follower_history.ex
+and PROGRESS.md only; protected paths unchanged. Acceptance at HEAD: format passed,
+warnings-as-errors compile passed, `mix test --seed 0` 66 passed, `scripts/loop.sh --check`
+passed all seven tasks. Completed observe never emits :unsupported. Evidence is finite
+fixtures and frozen-gain models, not universal parity, live integration, security or
+performance. Total spend unknown; one coder call. No further loop is authorized.

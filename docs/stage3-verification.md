@@ -27,7 +27,7 @@ tests retained, including all non-temporary promises. S2-loop task checks are
 incorporated into S3-history, preventing old attempt-ID collisions. S2-tree is
 replaced by S3-tree. No old logs/attempt metadata deleted.
 
-## Current checks
+## Pre-run kit checks (historical)
 
 - Supplied stubs: format and warnings-as-errors compile pass; 53/66 tests pass,
   13 expected unfinished-path failures. All 46 pacing/config/mapping tests pass.
@@ -96,6 +96,18 @@ required for all records. Non-clean exact numerical fixture checks remain finite
 acceptance evidence, not a universal binary64 identity promise. Total test count
 stays 66 (S3-history 20); task IDs and protections unchanged. No coder/model launch.
 
+## Post-run evidence
+
+Single runner run from the clean gate commit 3ceca1f, exit 0, `every task passes`.
+S3-history passed on attempt 1 with claude-haiku-5-5 (commit 89a1a81, Coder-Command
+trailer). S3-tree passed the judge without a coder attempt. No gpt-6.1-sol escalation,
+no discard, no STOP. Changed by the run: lib/pll/follower_history.ex only (plus a
+PROGRESS.md note); protected paths unchanged. Acceptance at HEAD: format check passed;
+warnings-as-errors compile passed; `mix test --seed 0` 66 passed; `scripts/loop.sh --check`
+passed T1, T2, T3, S2-config, S2-mapping, S3-history and S3-tree. Coder calls: one.
+Total spend unknown. These are finite fixture results, not universal parity, live
+integration, security or performance evidence.
+
 ## Limits and next gate
 
 Feasibility on Elixir 1.20.4 / OTP29, not the future coder implementation. Finite
@@ -105,5 +117,5 @@ No broader runtime matrix, performance/security/release/live-model/owner-use
 acceptance. Runtime effects are constrained by library design/tests, not a process
 sandbox. Provider caps owner-confirmed only; spend/remaining unknown, original
 $25 total unchanged, no added authorization. Parent review of this complete kit and the
-159-record corpus passed; one owner-authorized Stage 3 run is recorded in PROGRESS.md
-and README. No later kits/install/remotes/publication.
+159-record corpus passed; the single owner-authorized Stage 3 run then completed (see
+Post-run evidence below). No later kits/install/remotes/publication.

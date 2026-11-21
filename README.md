@@ -1,8 +1,7 @@
 # pll-elixir — exact pacing and clock following
 
-> **Stage 3 kit passed parent review (kit and 159-record public-Go corpus); one owner-authorized Stage 3 implementation run is authorized and has not run at this commit.**
-> Stage 1 and bounded Stage 2 are implemented. Supplied Stage 3 history paths are
-> intentionally unfinished until that run. The full normative follower contract below is unchanged.
+> **Stage 3 implementation completed by the single authorized runner run (exit 0); author review gate.** Completed observe never emits `:unsupported`. Evidence is finite fixtures only: not universal parity, live integration, security or performance.
+> Stage 1, Stage 2 and Stage 3 are implemented; the full normative follower contract below is unchanged.
 > Stage 2 run limitations/approvals below are historical, not current launch authority.
 
 This library helps audio/video, sensor, packet and device-buffer applications
@@ -35,7 +34,7 @@ They work separately or together: follower trim can steer a pacer.
 | Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
 | Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and benchmarks; decide before the affected stage. No task may assume them. |
 
-**Current gate: Stage 3 parent review passed; one authorized Stage 3 implementation run (not yet executed at this commit).**
+**Current gate: author review of the completed Stage 3 implementation (run completed once; no further loop authorized).**
 See [Stage 3 verification](docs/stage3-verification.md) and operation commands at
 end of this README. The original total $25 constraint is unchanged; provider caps
 are owner-confirmed, not independently verified, and spend/remaining are unknown.
@@ -815,7 +814,7 @@ seams; no Stage 1 refactoring or dependencies. Deferred until Stage 3: window,
 outlier, step histories and shared Go fixture encoding/corpus; wider runtime,
 release/publication and adapters need later review. New contract gaps block work.
 
-## Stage 3 kit operation (parent review passed; single authorized run)
+## Stage 3 kit operation (run completed once; not authorized again)
 
 Prepared directly on `kit/stage3-follower-parity`, over actual Stage 2 commit
 `e3352c209a2ba75359018f579643d7debc265382`; no archive to apply. The kit includes
@@ -849,8 +848,9 @@ fail. On the external reference all tasks and 66 tests pass. Exact evidence,
 limitations and intentional supersession: [verification](docs/stage3-verification.md).
 No private reference may be copied into the coder checkout or read by the coder.
 
-**Authorized single run.** Exact command, without model substitution or increased
-budget:
+**Stage 3 run completed once (exit 0); not authorized again.** The authorized command was
+run from the clean committed non-main kit checkout, with output in ignored `.loop/stage3.run.out`
+and exit code in `.loop/stage3.exit`:
 
 ```sh
 MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \
