@@ -201,3 +201,36 @@ scripts/bench/runner.exs and PROGRESS.md; library, tests, fixtures, READMEs, SPE
 complete seams are unchanged. Spend unknown; one coder call. No further loop is authorized.
 Coder notes (BENCH-1 attempt 1): Issuance units use observed Pacer.next_due cursor deltas
 because Span fields are private. Timing values are local finite-run evidence only.
+
+# Pacing demonstration design — PROPOSED, author gate only
+Verified actual clean HEAD cd35fec92eb4632b1efc52468a024eb5bacec497 on
+kit/throughput-benchmark; read readme-loop skill fully, root README and complete Go
+cmd/pllpace source/tests plus relevant sibling README. Sibling clean at pinned
+971282632129110794c9d6edd22026e9de2359be, strictly read-only. README now proposes
+bounded pacer/discard/local-loopback demonstration parity, not full flag parity;
+explicit ticker/find-max choice remains for author approval. Go receipt is not
+counted, payload Mbps excludes headers, slot zero and final flush affect timing.
+No implementation/kit/commit/model call/install/remote/live UDP action. No library,
+corpus, test, runner or .loop change. Original budget unchanged, spend unknown.
+Only non-network feasibility experiment: 100 receive-after-1ms waits on Elixir
+1.20.4/OTP29 measured min/median/max 1911458/1999125/2086583 ns; not pacing evidence.
+README records proposed commands/effects/caps, fake-seam tests and separately
+approved future 18-trial same-machine comparison. Stop for author inline approval;
+no implementation kit or further loop authorized by this design preparation.
+
+# Approved pacing scope A — kit preparation only, parent gate
+Scope A exact commands/effects/bounds and local18-trial comparison approved:
+19392658bps/188bytes/5s, discard/loopback group1/7,3repetitions per language;
+bitrate within1%, backlog/p99<=5ms; no ticker/find-max/remote/receipt guarantees.
+Prepared kit/local-pacing-demo over actual cd35fec, preserving README/progress draft.
+Complete protected tool parser/report/runtime/entrypoint; only pacing runner stub
+is coder work. Added11 tests,83 total; prior72 unchanged and pass. Stubs74/83,
+PACING-runner/PACING-tree fail; all seven prior task checks pass. External reference
+on actual library/benchmark passes83 and all9 unchanged judge tasks. Four isolated
+mutations caught; public low-rate1s discard CLI completes but fails bitrate verdict
+as expected from slot zero; no live ATSC/UDP comparison. Evidence docs/pacing-verification.md.
+Runner cmp exact; mechanics26pass/26mutations caught;54protected paths verified.
+Historical .loop preserved: judge checks run in temporary checkouts only. No coder,
+model call, install/fetch, remote/publication or Go modification. Original$25
+unchanged, caps owner-confirmed/unverified, spend unknown. Kit commit authorized;
+parent review required before coder launch; actual live trials reserved until then.

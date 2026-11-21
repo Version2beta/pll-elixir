@@ -1,3 +1,59 @@
+# Pacing supporting contract — current overlay
+
+Subordinate to README.md Local real-time pacing demonstration (approved scope A)
+and Pacing kit operation. Preserve all historical library/benchmark behavior;
+old writable-path instructions below are historical only. README wins.
+
+Only scripts/pacing/runner.exs may be implemented; append PROGRESS.md. No new
+files. Keep exported names/spec/doc comments. Contract/runtime/entrypoint complete.
+Runner.run(cfg, io) validates through Contract.validate BEFORE any io function,
+then uses public Rate.bits_per_second, Pacer.new/due/next_due and Span.time.
+No private library fields; span.first/count are readable public extent.
+
+Injected io is a map of functions: now/0 monotonic integer elapsed ns; wait/1
+positive whole ms, returns :ok or :cancelled; cancelled/0 boolean; write/1 binary
+returns {:ok, actual_bytes} or {:error, actual_bytes, reason}; progress/1 scalar map.
+Production Runtime provides these and owns processes/sockets. Worker origin starts
+after output setup; coordinator guard also bounds setup. No effects in library.
+
+State chain starts fresh cursor zero, due cap4096, never skips. Call clock before
+each call, check cancel then deadline then actual caps (1000000 calls/offers).
+Count due calls including empty; record one now-Span.time(span,0) per nonempty
+span before writes. Count offered BEFORE unit submission and check cancellation
+and offer cap between units. Complete already issued batch on normal deadline.
+Do not stop between units just because clock passed duration. Group 1 in discard,
+configured per_datagram in loopback; zero-filled unit bytes. Flush final partial
+only on normal deadline; failed/cancelled/capped buffers discarded, never reused.
+Writer bytes counted even on error; short success is {:write_error,:short_write}.
+Errors become stop {:write_error,reason}; never retry. Invalid writer result fails
+with {:write_error,:invalid_writer_result}. Count every attempted flush as send_calls,
+including discard calls (not necessarily network sends). Flush time is inside
+elapsed/backlog. After each successful batch report roughly once per second using
+observed offered/accepted/elapsed counters, then recompute min(next due-now,
+deadline-now); wait ceil(positive ns/1000000), never busy-wait for a future slot.
+Cancellation stops with :cancel, cap with :cap, normal stop :deadline. Contract.report
+computes final metrics using final now and next_due from retained current state.
+Do not keep span/state/payload histories. Lateness list bounded by call cap.
+
+Deterministic tests: test/pacing/runner_test.exs 11 tests map to README bounds,
+Go quantiles/report rules, immutable schedule/slot0/low-rate deadline, 4096 catchup,
+grouping/final flush time/backlog, partial/error writes, cancellation, whole-batch
+stop, frozen clock actual cap, all three ATSC command configurations with fake
+clock and exact rational count, process owner/error/guard/cleanup without network
+or deliberate waits. Reference feasibility is not live actual implementation
+acceptance. Prior72 tests unchanged. PACING-runner and PACING-tree must fail
+unfinished runner; whole tree has83 tests. No UDP in runner judge; full18 trials
+reserved for actual implementation after review, not automated kit tests.
+
+Runtime monitors worker and links receiver to worker; on cleanup unlinks/stops
+and observes receiver termination. Guard kills and observes worker termination;
+linked receiver termination/resource release remains subject to VM/OS scheduling.
+Ctrl-C may prevent output. Do not claim hard real-time cancellation or receipt.
+Only local loopback effects as approved. No ticker/search/remote/payload products.
+Contract gaps block affected work for review. No launch at preparation checkpoint.
+
+---
+
 # Benchmark supporting contract — current overlay
 
 Subordinate to README.md sections Throughput benchmark and Benchmark kit operation.

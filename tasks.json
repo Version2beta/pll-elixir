@@ -1,6 +1,6 @@
 {
-  "format": "mix format && mix format scripts/bench/*.exs scripts/throughput.exs",
-  "format_check": "mix format --check-formatted && mix format --check-formatted scripts/bench/*.exs scripts/throughput.exs",
+  "format": "mix format && mix format scripts/bench/*.exs scripts/throughput.exs && mix format scripts/pacing/*.exs scripts/pacing.exs",
+  "format_check": "mix format --check-formatted && mix format --check-formatted scripts/bench/*.exs scripts/throughput.exs && mix format --check-formatted scripts/pacing/*.exs scripts/pacing.exs",
   "check": "MIX_ENV=test mix compile --warnings-as-errors",
   "protected": [
     "(^|/)README\\.md$",
@@ -17,7 +17,10 @@
     "^lib/pll/follower_core\\.ex$",
     "^lib/",
     "^scripts/bench/contract\\.exs$",
-    "^scripts/throughput\\.exs$"
+    "^scripts/throughput\\.exs$",
+    "^scripts/bench/",
+    "^scripts/pacing/(contract|runtime)\\.exs$",
+    "^scripts/pacing\\.exs$"
   ],
   "tasks": [
     {
@@ -84,12 +87,20 @@
       "tier": "normal"
     },
     {
-      "id": "BENCH-tree",
-      "title": "Final whole-tree and public benchmark smoke",
-      "test": "mix format --check-formatted && mix format --check-formatted scripts/bench/*.exs scripts/throughput.exs && MIX_ENV=test mix compile --warnings-as-errors && mix test --seed 0 && mix run scripts/throughput.exs --smoke",
+      "id": "PACING-runner",
+      "title": "Bounded public-API pacing loop, timing/accounting and failures",
+      "test": "mix test test/pacing --seed 0",
       "expect": [
-        "^Result: 72 passed$",
-        "^.*workload: :step.*$"
+        "^Result: 11 passed$"
+      ],
+      "tier": "normal"
+    },
+    {
+      "id": "PACING-tree",
+      "title": "Whole tree including deterministic pacing command examples",
+      "test": "mix format --check-formatted && mix format --check-formatted scripts/bench/*.exs scripts/throughput.exs && mix format --check-formatted scripts/pacing/*.exs scripts/pacing.exs && MIX_ENV=test mix compile --warnings-as-errors && mix test --seed 0",
+      "expect": [
+        "^Result: 83 passed$"
       ],
       "tier": "normal"
     }

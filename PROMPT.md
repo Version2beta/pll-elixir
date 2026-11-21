@@ -1,21 +1,17 @@
-Implement only the supplied benchmark task from these repository files.
-
-1. Read approved README.md (Decisions and Throughput benchmark), subordinate
-   current SPEC.md overlay, and PROGRESS.md. README wins. Historical stage
-   write permissions do not apply. Contract gaps require stop/review, not guesses.
-2. Edit only scripts/bench/runner.exs and append PROGRESS.md. Preserve exported
-   names/signatures/doc comments. Private helpers within that file are local
-   freedom; no new implementation files. All library APIs/algorithms are complete.
-3. Never edit approved READMEs, SPEC, tests/support/fixtures, docs, project/config,
-   formatter, license, gitignore, tasks, PROMPT, runner or complete files including
-   scripts/bench/contract.exs and scripts/throughput.exs. Do not alter discovery.
-4. No private reference or outside implementation reads (including siblings).
-   If encountered, record and stop. Work only from this checkout. No dependencies,
-   installs, network, secrets, environment config, VM tuning, workload concurrency,
-   sleeps, subprocesses or library effects. Tool-only clocks/introspection/stdout
-   are allowed exactly as README defines; synthetic library inputs only.
-5. Run task tests, formatting (including explicit script inputs) and prior tests.
-   Append three progress lines: task ID; change/evidence; remaining/blocker.
-   New contract decisions block work; notes do not automatically stop the runner.
-6. Stop. Do not commit, mark tasks done, discard user work, launch models or loops.
-   The unchanged runner alone judges/commits/discards authorized attempts.
+Implement only the supplied pacing task from these repository files.
+1. Read approved README.md Decisions/Local real-time pacing demonstration/Pacing kit
+   operation, current SPEC.md overlay and PROGRESS.md. README wins; gaps require stop.
+2. Edit only scripts/pacing/runner.exs and append PROGRESS.md. Preserve exported
+   signatures/doc comments. Private helpers inside that file only. Use public PLL
+   API; never inspect private state, reuse stale immutable states or skip backlog.
+3. Never edit READMEs, SPEC, docs, tests/fixtures/support, library, benchmark,
+   project/config, tasks, PROMPT, gitignore, formatter, license, loop or complete
+   contract/runtime/entrypoint. No external implementation or sibling reads.
+4. No deps/installs/secrets/environment configuration/remotes/publication/VM tuning,
+   models/subprocesses, ticker/search or remote UDP. Work through injected seams;
+   tests require no network/live waits. Do not run live demonstration during coding.
+5. Run task tests, prior tests and format including scripts. Append three lines:
+   task ID; changes/evidence; remaining/blocker. New decisions block work for review;
+   progress notes do not automatically halt retries. Do not improvise contract.
+6. Stop. Do not commit, mark tasks done, discard changes, launch loops/models or
+   change discovery. Runner alone judges/commits/discards scoped attempts.

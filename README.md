@@ -35,10 +35,13 @@ They work separately or together: follower trim can steer a pacer.
 | Approved | Bounded dependency-free public-API throughput harness kit and verified kit commit; tool-only clock/introspection/output effects as described below. Parent review before coding loop; no expanded budget, library changes or dependencies. |
 | Approved | Parent launch review of the benchmark kit (HEAD `4867fc4d82168e230c37ea2022ca28a2b6eb0da1`, branch `kit/throughput-benchmark`) passed, including the independent-review strengthening in [benchmark verification](docs/benchmark-verification.md). One coding loop is authorized with the exact command in the Benchmark kit operation section: claude-haiku-5-5 for normal attempts, gpt-6.1-sol high for the second attempt and gpt-6.1-sol max for the final attempt, using MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Runner commit and discard permissions apply only to passing attempts and attempt-owned failures. Only `scripts/bench/runner.exs` is writable implementation. The original $25 total is not expanded; provider caps are owner-confirmed, not independently verified, and spend is unknown. No library change, dependency, installation, remote, publication or additional loop is authorized. |
 | Approved | Benchmark loop completed once with exit 0: BENCH-1 passed on the first claude-haiku-5-5 attempt (`e477f81`); BENCH-tree passed the judge with no coder attempt. No gpt-6.1-sol escalation, discard or STOP occurred. The loop changed only `scripts/bench/runner.exs` and `PROGRESS.md`. Local timed evidence is one short machine run, not a speed claim; spend is unknown. The loop is not authorized again. |
+| Approved | Local real-time pacer demonstration and bounded local trials under the [contract](#local-real-time-pacing-demonstration--approved-scope-a). Kit preparation/verified kit commit authorized; stop for parent review before coder launch. |
+| Approved | Scope A: bounded pacer demonstration parity, not full `pllpace` flag parity. Ticker/find-max/remote destinations/arbitrary payloads excluded; receipt/loss guarantees excluded. The three configurations, three repetitions per language and thresholds below are approved local trials, reserved until actual implementation. |
 | Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
 | Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and broader benchmarks; decide before the affected stage. No task may assume them. |
 
-**Current gate: author review of the completed throughput benchmark implementation (single loop run; no further loop authorized).**
+**Current gate: parent review of the verified local pacing kit; no coder launch authorized yet.**
+The completed throughput benchmark remains at its author review gate (single loop run).
 See [benchmark verification](docs/benchmark-verification.md) and the Throughput benchmark section;
 [Stage 3 verification](docs/stage3-verification.md) remains the historical Stage 3 record. The original total $25 constraint is unchanged; provider caps
 are owner-confirmed, not independently verified, and spend/remaining are unknown.
@@ -1031,3 +1034,253 @@ escalation; no substitutions, extra calls or fanout. Original aggregate $25
 budget is not expanded; provider caps owner-confirmed, not independently verified;
 spend/remaining unknown. Attempt/time limits do not enforce dollars. Contract gaps
 block the run for review; progress notes do not stop retries automatically.
+
+## Local real-time pacing demonstration — approved scope A
+
+**Approved contract; kit contains an unfinished runner, not a completed tool.** A developer runs a bounded
+local demonstration of the actual Elixir pacer driving discard or local UDP,
+then compares the same workload with Go on the same machine. This is different
+from the existing throughput microbenchmark. It does not change the library,
+its no-I/O contract, the corpus, tests, runner or historical logs. The initial
+port's CLI exclusion is narrowed only for this isolated tool. Scope A, its exact
+effects/bounds and local comparative trials below are approved. Kit preparation
+and verified kit commit only at this checkpoint; parent review before coding.
+No paid call or live UDP trial is performed during preparation. Original aggregate $25 budget unchanged; spend/remaining unknown,
+provider caps owner-confirmed, not independently verified.
+
+### Source basis and parity boundary
+
+Inspected sibling Go HEAD `971282632129110794c9d6edd22026e9de2359be`, clean,
+read-only. These are source facts, not evidence of past or current performance:
+
+* `../pll/cmd/pllpace/main.go:32–40,55–83`: defaults are 100,000,000 bps,
+  1000-byte units, 10 seconds, pacer, discard, one unit/datagram; search off,
+  slack 5 ms. Validation precedes payload/socket creation. Duration accepts
+  finite fractional seconds truncated to ns, at least 1 ns and below signed
+  duration overflow; rate is positive uint64, unit bits/int and grouping must
+  fit; UDP payload <=65507. There is no small resource/wall-time cap for normal
+  trials; only search rates are capped at 10^12 bps.
+* `main.go:173–231`: fresh rate/pacer, zero-filled unit, monotonic elapsed origin;
+  `Due(now,4096)` drains oldest slots, never skips. Each successful call counts
+  as a wake-up (including empty spans); lateness records `now-Time(0)` once per
+  nonempty span, **before** output. Offer increments before sink submission;
+  max batch is slots from one call, not units in a datagram. Sleep until the
+  earlier of next due and trial deadline, if positive; stop before a new call
+  at/after deadline, but finish an already issued batch.
+* `main.go:102–170,185–194,312–325`: group UDP units and flush final partial
+  datagram on success; discard uses group 1 regardless of `-per-datagram`.
+  Count actual writer-accepted bytes, including partial bytes on error; clear
+  failed buffers, propagate errors/short writes, never carry them to another
+  trial. Final flush is inside elapsed time. Backlog is
+  `max(0, final_elapsed - next_due_ns)` after flushing. Mbps is accepted payload
+  bytes * 8 / elapsed seconds / 10^6, **excluding UDP/IP/link headers**.
+* `main.go:150–170,348–355`: sorted lateness uses index `floor(f*(n-1))`
+  (empty quantile 0), not interpolated percentiles or per-packet jitter. Search
+  passes only nonempty trials with backlog and p99 <= slack. Ordinary runs
+  print metrics, not a timing pass/fail, and timing failure does not set an
+  error exit code. Progress printing about once/second costs measured time.
+* `main.go:234–276`: ticker floors exact ns period, starts after one period,
+  offers one unit per delivered tick (ticks can drop), max batch 1, no lateness
+  samples. Backlog uses ideal `(offered+1)/units_per_second`, not next pacer due.
+* `main.go:359–419`: find-max is pacer-only: double starting bps until failure
+  or rate limit, then bisect to ratio <=1.05 or adjacent integers. Repeated
+  trials multiply cost; neither highest passing rate nor UDP success proves
+  lossless delivery. `main.go:284–300` requests an 8 MiB read buffer without
+  checking success, then reads/discards loopback datagrams: **no receipt count**.
+  Receiver lifetime is process lifetime, not an explicitly closed trial socket.
+* `../pll/README.md:260–266` describes real pacing/search and loopback, separate
+  from `make bench`; there is no recorded ATSC result there.
+
+Go test inventory, fully read, not rerun here (`../pll/cmd/pllpace/main_test.go`):
+writer failure/short write (43), per-trial flush (64), invalid/valid options (82),
+exact ticker periods (137), grouping/partial writes (153), both runners' accounting
+and final errors (182), low-rate deadline (220), delayed final flush in elapsed
+and backlog (241), bytes with error (255), bisection progress/adjacency (264),
+nonempty/boundary sustained criterion (308). These use fake writers and some live
+timers; none establishes receiver loss/jitter or a sustained real UDP bitrate.
+
+**Scope decision:**
+
+* **A (approved):** pacer-mode demonstration parity: discard, loopback,
+  grouping 1/7, equivalent metrics and same-machine Go comparison. Bounded
+  defaults differ deliberately from Go. Reject `--mode ticker`, `--find-max`
+  and remote `host:port`; label this *pacer demonstration parity*, never full
+  command parity.
+* **B (excluded; separate design required):** add timer-per-unit comparator and bounded
+  find-max. BEAM millisecond timers cannot promise Go's microsecond ticker;
+  dropped-tick semantics, trial/rate/aggregate-wall caps and fair comparisons
+  must be approved before a kit. Full external-target flag parity is not offered
+  by either choice. Remote UDP and arbitrary payloads require specific approval.
+
+### Approved finished-tool command and effects (scope A)
+
+Examples are promises for a future tool, **not executable instructions now**:
+
+```sh
+mix run scripts/pacing.exs
+mix run scripts/pacing.exs --bps 19392658 --unit-bytes 188 --seconds 5
+mix run scripts/pacing.exs --bps 19392658 --unit-bytes 188 --seconds 5 --udp loopback --per-datagram 1
+mix run scripts/pacing.exs --bps 19392658 --unit-bytes 188 --seconds 5 --udp loopback --per-datagram 7
+# Future same-machine Go counterparts (sibling remains read-only; caches outside it):
+(cd ../pll && GOPROXY=off GOTOOLCHAIN=local go run ./cmd/pllpace -bps 19392658 -unit-bytes 188 -seconds 5)
+(cd ../pll && GOPROXY=off GOTOOLCHAIN=local go run ./cmd/pllpace -bps 19392658 -unit-bytes 188 -seconds 5 -udp loopback -per-datagram 1)
+(cd ../pll && GOPROXY=off GOTOOLCHAIN=local go run ./cmd/pllpace -bps 19392658 -unit-bytes 188 -seconds 5 -udp loopback -per-datagram 7)
+```
+
+Approved defaults: 19,392,658 bps, 188 bytes, 5 seconds, discard, grouping 1,
+pacer only. This is approximately ATSC payload rate: 12,894.0545 units/s,
+77.5551 microseconds/unit. Zero-filled bytes are timing payload, not valid MPEG-TS.
+No flags means **no network**. Only literal `--udp loopback` enables IPv4
+127.0.0.1, ephemeral ports, one receiver reading/discarding and one sender;
+no DNS, remote destination, file payload or result file. Receiver read buffer
+request 8 MiB is best-effort and not evidence of effective buffer size.
+
+Only the shown value flags are supported. No config/environment inputs, positional
+arguments, unknown/duplicate/missing options or alternative destinations.
+All numeric strings canonical positive decimals: bps 1..100000000, unit bytes
+1..65507, seconds integer 1..10, per-datagram 1..65507 with product <=65507
+(even in discard, where effective grouping is 1). Before allocation, timers or
+sockets, validate all types/products plus `1+ceil(bps*seconds/(8*unit_bytes))
+<=1000000`. Also cap actual offers and calls/lateness samples at 1,000,000 each;
+cap exhaustion is an incomplete failed trial, not a sustained result. Due cap
+4096 is fixed. Bounds are tool constraints, not library API changes.
+
+Tool-only effects: clocks, cancellable timed waits, bounded coordinator/worker
+and loopback receiver processes, local sockets, runtime metadata and stdout/stderr;
+Mix build caches as usual. No installs, dependencies, subprocess comparison runner,
+VM-global tuning, secrets, persistent results or external actions. Go commands are
+manual comparison, not something the Elixir tool launches. Report revision/dirty
+state separately using operator Git commands, plus runtime/platform/schedulers
+and all effective options with each comparison. No environment dump.
+
+### Approved structure, timing and failures
+
+Isolated `scripts/pacing.exs` entrypoint and `scripts/pacing/` helpers, using only
+public `PLL.Rate`, `PLL.Pacer`, `PLL.Span`; no private fields/algorithm changes.
+A single worker retains each returned immutable pacer state, origin and counters;
+there is no shared mutable schedule or implicit library clock. Inject tool-local
+clock/wait/writer seams for deterministic tests, not a new public library API.
+
+Use `System.monotonic_time(:nanosecond)-origin` integer offsets. After processing
+a span, recompute remaining time to next due/deadline; if positive use a
+cancellable receive timeout rounded **up** to whole milliseconds. Do not use
+`Process.sleep` as a microsecond timer, repeated zero-time polling, busy-spin
+waiting or scheduler changes. Coarse wakeups intentionally produce batches;
+when already overdue, immediately drain another capped batch, checking deadline
+and cancellation between calls and cancellation between units. Never skip to hide
+backlog. Normal deadline stops new calls, finishes current batch and flushes
+partial grouping; include final write in elapsed and backlog as Go does.
+
+Coordinator monitors worker/receiver, imposes duration+2 seconds runtime guard
+(excluding Mix startup), and cancels/kills owned processes if they do not stop.
+Worker owns sender socket; receiver owns read socket. Normal/error paths close
+resources and terminate receiver; process death must release owned sockets and
+pending timers. Cancellation aborts buffered output, reports incomplete/nonzero,
+never a sustained verdict. Socket/open/read/send/flush failures stop the trial;
+no retries, cross-trial buffers or false accepted counts. UDP success counts
+whole datagram payload only, not receipt. Fake writer tests cover partial/error
+accounting even though the UDP adapter reports whole-send success or error.
+Ctrl-C/VM termination may prevent a final report; it is not a successful trial.
+Wall guard is a safety bound subject to OS/VM scheduling, not a hard real-time SLA.
+
+Report target, offered units, accepted payload bytes, elapsed ns, writer Mbps,
+backlog ns, call/wake-up count, average/max units per call, nonempty lateness sample
+count and median/p99/max ns with Go's quantile rule; distinguish effective datagram
+grouping and send-call count from Due-call count. Print roughly once/second like
+Go, inside timing. Go lacks a send-call metric, so do not claim identical output.
+Report completed/deadline/error/cancel/cap/guard stop reason and timing verdict.
+Slot zero is due immediately: short runs can appear fast by up to about one unit;
+no start-slot subtraction or forced unit-count equality across runtimes. Backlog
+is cursor lag, not queue depth. Lateness is oldest scheduled unit at call entry,
+not each unit's send time, network/receiver jitter or a bound on every unit.
+
+### Approved verification and comparative acceptance
+
+Before a kit: independently verify fake-clock tests for immutable chaining,
+slot zero, empty/4096-capped batches, coarse wakeups/backlog without skips,
+low-rate deadline (never wait for a distant slot), final partial flush time/count,
+quantile boundaries, errors/partial writes, cancellation/guard/cleanup and all
+bounds rejected before effects. Future source-named tests live under
+`test/pacing/`; existing deterministic suites stay unchanged and must still pass.
+No network/timers in deterministic acceptance; separately authorized local trials
+are essential, not replaced by microbenchmarks or fake writers.
+
+Approved future local trials (after actual implementation): 3 configurations (discard, UDP group 1, UDP group 7),
+3 sequential repetitions per language, 5 seconds each, fixed 19,392,658 bps and
+188-byte units. Alternate language order, same machine/load, record versions,
+revisions/dirty state and individual raw summaries, not invented averages.
+18 trials = 90 requested seconds, each externally limited to 12 seconds including
+startup, aggregate session <=300 seconds including preparation; stop on errors,
+no retries/search/rate escalation. Offline build caches only, no fetches.
+
+Approved criterion per completed pacer trial: nonempty, accepted bytes equal
+188*offered, no errors/cap/cancel/guard, final backlog <=5 ms and oldest-unit
+p99 <=5 ms (Go's search timing criterion applied explicitly), plus writer bitrate
+within 1% of target for this 5-second demonstration. The bitrate bound is an
+additional approved demonstration check, **not a Go normal-run pass rule**.
+Record all repetitions and both languages' results, including failures; failure
+requires review, not auto-tuning/relaxing thresholds or claiming parity complete.
+No universal speed ratio or guaranteed success on arbitrary hardware promised.
+
+This validates local offered/accepted rate and schedule catch-up under those
+conditions. It does **not** validate receipt, loss, receiver drain stability,
+network jitter, hardware buffers, wire bitrate, valid TS content, remote delivery
+or full flag parity. No receiver counters or new transport product are proposed.
+
+**Feasibility evidence now (no network):** Elixir 1.20.4/OTP 29, 100 sequential
+`receive after 1` waits timed with monotonic ns: min 1,911,458 ns, median
+1,999,125 ns, max 2,086,583 ns, total experiment 201,099,625 ns. This supports
+coarse-wait/batch design, not 77.6 microsecond wakeups or demonstrated ATSC pacing.
+At roughly 2 ms a batch is about 26 units; actual writer/lateness/backlog viability
+remains unproven until implementation and authorized live local trials.
+
+**Current gate:** scope A is approved. Review the verified kit before coder launch;
+choice B remains excluded. The full live comparison is reserved for the actual
+implementation, not a reference result. No coder launch follows automatically.
+
+
+### Pacing kit operation — prepared, parent review before launch
+
+Prepared on `kit/local-pacing-demo` over actual completed library/benchmark HEAD
+`cd35fec92eb4632b1efc52468a024eb5bacec497`, preserving existing README/progress drafts.
+No archive to apply. Only `scripts/pacing/runner.exs` and appended progress notes
+are coder work; all library/benchmark files, tests, fixtures, configuration,
+READMEs/docs, complete pacing contract/runtime/entrypoint and runner are protected.
+PACING-runner is one normal task; PACING-tree replaces BENCH-tree and stays last.
+Earlier 72 checks remain unchanged. Existing `.loop/` history is preserved; task
+IDs are new. Evidence/protection inventory: [pacing verification](docs/pacing-verification.md).
+
+No installs/fetches: installed Mix/Elixir/OTP, Bash, Git, jq and timeout/gtimeout;
+pi only for a later authorized coder launch. Verified runtime Elixir 1.20.4/OTP29.
+Check commands (stubs intentionally fail the new task and whole-tree task):
+
+```sh
+git status --short
+mix format --check-formatted
+mix format --check-formatted scripts/bench/*.exs scripts/throughput.exs scripts/pacing/*.exs scripts/pacing.exs
+MIX_ENV=test mix compile --warnings-as-errors
+mix test test/pll test/bench --seed 0
+mix test --seed 0
+bash scripts/loop.sh --check
+```
+
+The exact future launch command, **withheld pending parent review**, is:
+
+```sh
+MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \
+CHEAP_CMD='pi --provider anthropic --model claude-haiku-5-5 --thinking high --print --no-session' \
+STRONG_CMD='pi --provider openai-codex --model gpt-6.1-sol --thinking high --print --no-session' \
+STRONGEST_CMD='pi --provider openai-codex --model gpt-6.1-sol --thinking max --print --no-session' \
+bash scripts/loop.sh
+```
+
+The unchanged runner commits passing judged attempts on this non-main branch and
+discards only attempt-owned failed changes under prior scoped permissions.
+`.loop/` retains prompts/logs/attempts/diffs; root `STOP` names exhausted task.
+Do not reset historical state. New contract gaps block work for operator review;
+progress notes do not stop retries automatically. Private helper organization
+inside runner.exs is local freedom, not new files/features/effects. No sibling
+reads by coder, deps, tuning, remotes, publication or extra model calls. Original
+$25 aggregate unchanged; caps owner-confirmed, unverified; spend/remaining unknown.
+Attempt/time caps are not dollar enforcement. Return for review after this kit;
+never chain another kit or automatically run the approved live trials.
