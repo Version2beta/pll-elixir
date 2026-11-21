@@ -56,12 +56,12 @@ machine, not a claim of wider runtime acceptance.
 | Stage 1 Rate factories, gcd, uint64 terms, strings, zero sentinel, validation/messages | rate_test.exs / T1, 9 tests |
 | Stage 1 exact due/floor/ceil, claims, skip, cursor U, bounds, empty/lazy spans, retained snapshots, pacing examples | pacer_test.exs, span_test.exs, readme_test.exs / T2, 21 tests |
 | Stage 1 trim/no-op/floor anchor/bounds and independent rational oracle | trim_test.exs, model_test.exs, rational_oracle_helper.exs / T3, 8 tests |
-| Full defaults, zero config, field order/reasons, types/envelopes, finite extremes, status/state/error spelling | follower_config_test.exs / S2-config, 4 tests |
-| Anchoring, unanchored/scalar errors, half ties, >2^53 anchors, wide cancellation and exact binary periods via integer oracle | follower_mapping_test.exs / S2-mapping, 4 tests |
+| Full defaults, zero config, field order/reasons, types/both envelopes, finite extremes, status/state/error spelling | follower_config_test.exs / S2-config, 4 tests |
+| Anchoring, unanchored/scalar errors, wrong kinds, both envelopes, remote overflow, half ties, >2^53 anchors, true wide-difference cancellation and exact binary periods via integer oracle | follower_mapping_test.exs / S2-mapping, 4 tests |
 | Moderate independent equations, 240 updates, offset/mapping/jitter tolerance | follower_loop_test.exs + follower_equation_oracle_helper.exs / S2-loop |
-| dt=0, lock equality/clearing/default eight-sample chain, two-inlier jitter, exact holdover and reset, immutable snapshots | follower_loop_test.exs / S2-loop |
-| Temporary unsupported paths, unrounded classification, precedence and valid continuation, feed overflow rollback | follower_loop_test.exs / S2-loop |
-| Extreme finite gain combinations, cap/underflow, offset clamp/trim saturation, Imax threshold/error/jitter saturation | follower_loop_test.exs / S2-loop |
+| dt=0, lock equality/clearing/default eight-sample chain, two-inlier jitter, exact holdover and reset config retention, immutable snapshots | follower_loop_test.exs / S2-loop |
+| Temporary unsupported paths, exact 1.25 ns unrounded outlier/lock classification, precedence and valid continuation, feed overflow rollback | follower_loop_test.exs / S2-loop |
+| Extreme finite gain combinations, cap/underflow, both offset clamp/trim saturations, Imax outlier/lock threshold/error/jitter saturation | follower_loop_test.exs / S2-loop |
 | First follower-to-pacer README workflow, failed transitions retain old states | follower_loop_test.exs / S2-loop, 9 tests total |
 | Formatting, warnings-as-errors, full discovered tree | S2-tree, 55 tests |
 
@@ -100,3 +100,13 @@ No additional model calls, Stage 3, remotes or installs during this preparation.
 Reference/fixture results are not coder implementation, complete parity, live
 integration, performance, security or real-use acceptance. A contract blocker
 must stop the run through the harness; progress notes alone cannot stop retries.
+
+Review strengthening retained the same natural test groups/counts (4 config,
+4 mapping, 9 loop, 55 whole-tree). A period of 1.25ns gives e=-1.25 while the
+reported error rounds to -1; it must be unsupported at outlier threshold 1 and
+accepted but acquiring at lock threshold 1/count 1. Independent reference
+mutations that classify using round(e) instead each fail this protected case.
+True wide mapping fixtures subtract 0-Imin=2^63 before converting to binary64,
+then cancel with integer base -10 to return 9223372036854775798; the older Imax
+fixture remains separately labeled as signed-fitting difference rounding.
+These are checks of existing contract, not additional runtime behavior.

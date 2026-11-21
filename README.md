@@ -755,7 +755,14 @@ check intentionally fail. The private reference overlay onto actual Stage 1
 passes 55 tests and unchanged runner T1–T3/S2-config/S2-mapping/S2-loop/S2-tree.
 Delivered stubs have 39/55 passing tests (16 expected failures); each new task
 fails. Config/mapping/loop reference task counts are 4/4/9. All three alias-based
-public README example fences execute on the reference. Runner bytes match the
+public README example fences execute on the reference. Review-strengthened checks
+also cover exact 1.25 ns unrounded outlier/lock classification, true wide integer
+difference cancellation, reset config retention, both input envelopes, wrong
+kinds, remote overflow, both trim clamps and the Imax binary64 lock threshold.
+Independent rounded-outlier and rounded-lock mutations each fail the strengthened
+loop suite (8/9 passing), while the unmodified reference passes all 55 tests.
+These additions extend existing test cases; task counts remain 4/4/9 and 55.
+Runner bytes match the
 skill source; its 26 disposable regression cases and 26 mutation checks pass.
 These are local feasibility results, not coder implementation, complete follower,
 Go parity, real-device use or a wider runtime matrix. No coder/model was launched.

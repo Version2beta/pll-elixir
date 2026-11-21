@@ -37,3 +37,14 @@ Stage 2 verification: actual Stage 1 baseline and delivered-stub prior suites pa
 runner all seven tasks (9/21/8/4/4/9/55), whole tree and three public examples.
 Protection inventory checked, runner byte-identical; disposable regression suite
 26/26 passes and 26/26 mutations caught. No coder/model subprocess launched.
+
+Stage 2 prelaunch review strengthening: exact 1.25ns outlier/lock fixtures reject
+classification using rounded errors; each independent mutation fails 1/9 loop
+tests. Added both input envelopes, wrong-kind getters/observe/reset, true wide
+mapping cancellation, remote overflow, reset config retention, negative clamp/
+trim saturation and Imax binary64 lock threshold within existing test groups.
+Counts unchanged: reference tasks 9/21/8/4/4/9/55 all pass; delivered stubs retain
+38 Stage 1 passes and fail every S2 task (39/55 whole tree, 16 failures).
+Reference verification used a separate temporary overlay on actual Stage 1;
+owner checkout implementation stubs were never replaced. STOP for parent launch
+gate; no coder/model calls or Stage 3 work performed.

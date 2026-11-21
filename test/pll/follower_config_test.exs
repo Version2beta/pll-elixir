@@ -59,6 +59,18 @@ defmodule PLL.FollowerConfigTest do
                Follower.new(Map.put(cfg(), k, 9_223_372_036_854_775_808))
     end
 
+    for k <- [
+          :window_ns,
+          :outlier_threshold_ns,
+          :step_after,
+          :lock_threshold_ns,
+          :lock_count,
+          :holdover_after_ns
+        ] do
+      assert {:error, %Error{code: :overflow}} =
+               Follower.new(Map.put(cfg(), k, -9_223_372_036_854_775_809))
+    end
+
     assert {:error, %Error{field: :bandwidth_hz}} =
              Follower.new(%{cfg() | bandwidth_hz: 0.0, lock_count: 0})
 

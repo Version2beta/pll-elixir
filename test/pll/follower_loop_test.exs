@@ -52,6 +52,10 @@ defmodule PLL.FollowerLoopTest do
     assert Follower.offset(reset) == 0.0
     assert Follower.jitter(reset) == 0
     assert {:ok, _, %{status: :anchored}} = Follower.observe(reset, -10, -10)
+    {custom, _} = anchor(%{holdover_after_ns: 5})
+    {:ok, retained, _} = Follower.observe(Follower.reset(custom), 0, 0)
+    assert Follower.state(retained, 5) == {:ok, :acquiring}
+    assert Follower.state(retained, 6) == {:ok, :holdover}
     {ext, _} = anchor(%{}, @lo, 0)
     assert Follower.state(ext, @hi) == {:ok, :holdover}
   end
@@ -65,6 +69,7 @@ defmodule PLL.FollowerLoopTest do
     assert {:error, %Error{code: :overflow}} = Follower.observe(w, @hi + 1, 0)
     assert {:error, %Error{code: :invalid_argument}} = Follower.observe(w, nil, @hi + 1)
     assert {:error, %Error{code: :not_anchored}} = Follower.local(w, 0)
+    assert {:error, %Error{code: :unsupported}} = Follower.observe(Follower.reset(w), 0, 0)
     {f, _} = anchor(%{outlier_threshold_ns: 1_000_000})
     assert {:error, %Error{code: :unsupported}} = Follower.observe(f, 10_000_001, 9)
     assert Follower.local(f, 9) == {:ok, 9_000_000}
@@ -117,6 +122,24 @@ defmodule PLL.FollowerLoopTest do
     {:ok, r} = Rate.units_per_second(1000, 1)
     {:ok, p} = Pacer.new(r)
     assert {:ok, _} = Pacer.set_trim(p, Follower.trim(g))
+
+    {f, c} =
+      anchor(%{
+        max_offset_ppm: 999_999.9999999999,
+        bandwidth_hz: 1.7976931348623157e308,
+        damping: 1.0,
+        outlier_threshold_ns: @hi
+      })
+
+    negative =
+      Enum.reduce(1..5, f, fn k, acc ->
+        {:ok, next, %{status: :accepted}} = Follower.observe(acc, k * 1_000_000_000, k)
+        next
+      end)
+
+    assert Follower.offset(negative) == -c.max_offset_ppm * 1.0e-6
+    assert Follower.trim(negative) == -999_999_999_999
+    assert {:ok, _} = Pacer.set_trim(p, Follower.trim(negative))
   end
 
   test "README follower to pacer trim example and failures" do
@@ -167,12 +190,31 @@ defmodule PLL.FollowerLoopTest do
     {:ok, z, _} = Follower.observe(z, 0, 0)
     assert {:ok, _, %{error_ns: -1}} = Follower.observe(z, 0, 1)
     assert {:error, %Error{code: :unsupported}} = Follower.observe(z, 0, 3)
+    # Exact 1.25ns distinguishes unrounded classification from round-away(-1.25)=-1.
+    {:ok, r} = Rate.units_per_second(800_000_000, 1)
+    c = %{FollowerConfig.default(r) | outlier_threshold_ns: 1}
+    {:ok, z} = Follower.new(c)
+    {:ok, z, _} = Follower.observe(z, 0, 0)
+    assert {:error, %Error{code: :unsupported}} = Follower.observe(z, 0, 1)
+    c = %{FollowerConfig.default(r) | lock_threshold_ns: 1, lock_count: 1}
+    {:ok, z} = Follower.new(c)
+    {:ok, z, _} = Follower.observe(z, 0, 0)
+    {:ok, z, %{status: :accepted, error_ns: -1}} = Follower.observe(z, 0, 1)
+    assert Follower.state(z, 0) == {:ok, :acquiring}
     {:ok, r} = Rate.units_per_second(1_000_000_000, 1)
-    c = %{FollowerConfig.default(r) | outlier_threshold_ns: @hi}
+
+    c = %{
+      FollowerConfig.default(r)
+      | outlier_threshold_ns: @hi,
+        lock_threshold_ns: @hi,
+        lock_count: 1
+    }
+
     {:ok, z} = Follower.new(c)
     {:ok, z, _} = Follower.observe(z, 0, @lo)
     {:ok, z, %{error_ns: @lo}} = Follower.observe(z, 0, 0)
     {:ok, z, %{error_ns: @lo}} = Follower.observe(z, 0, 1)
     assert Follower.jitter(z) == @hi
+    assert Follower.state(z, 0) == {:ok, :locked}
   end
 end

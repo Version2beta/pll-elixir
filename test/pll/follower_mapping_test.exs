@@ -25,8 +25,19 @@ defmodule PLL.FollowerMappingTest do
 
     for fun <- [&Follower.local/2, &Follower.remote/2, &Follower.state/2] do
       assert {:error, %Error{code: :overflow}} = fun.(f, @hi + 1)
+      assert {:error, %Error{code: :overflow}} = fun.(f, @lo - 1)
       assert {:error, %Error{code: :invalid_argument}} = fun.(f, 0.0)
       assert_raise ArgumentError, fn -> fun.(nil, 0) end
+    end
+
+    for fun <- [&Follower.offset/1, &Follower.trim/1, &Follower.jitter/1, &Follower.reset/1] do
+      assert_raise ArgumentError, fn -> fun.(nil) end
+    end
+
+    assert_raise ArgumentError, fn -> Follower.observe(nil, 0, 0) end
+
+    for {l, r} <- [{@lo - 1, 0}, {0, @lo - 1}, {0, @hi + 1}] do
+      assert {:error, %Error{code: :overflow}} = Follower.observe(f, l, r)
     end
 
     assert {:error, %Error{code: :invalid_argument}} = Follower.observe(f, nil, @hi + 1)
@@ -61,10 +72,18 @@ defmodule PLL.FollowerMappingTest do
     end
 
     f = anchor(1_000_000_000, 1, @lo, 0)
-    # Displacement is 2^63, outside signed range, but integer base cancels.
+    # Signed-fitting difference Imax rounds to binary64 2^63; integer base cancels.
     assert Follower.local(f, @hi) == {:ok, 0}
     f = anchor(1_000_000_000, 1, 0, @lo)
     assert Follower.remote(f, @hi) == {:ok, 0}
+    # True wide difference: 0-Imin=2^63 before float conversion.
+    f = anchor(1_000_000_000, 1, -10, @lo)
+    assert Follower.local(f, 0) == {:ok, 9_223_372_036_854_775_798}
+    f = anchor(1_000_000_000, 1, @lo, -10)
+    assert Follower.remote(f, 0) == {:ok, 9_223_372_036_854_775_798}
+    f = anchor(1_000_000_000, 1, 0, @hi)
+    assert {:error, %Error{code: :overflow}} = Follower.remote(f, 1)
+    assert Follower.remote(f, 0) == {:ok, @hi}
     f = anchor(1_000_000_000, 1, @hi, 0)
     assert {:error, %Error{code: :overflow}} = Follower.local(f, 1)
     assert Follower.local(f, 0) == {:ok, @hi}
