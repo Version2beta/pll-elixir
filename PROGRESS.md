@@ -187,3 +187,7 @@ attempt-owned failures. The original $25 total is not expanded; provider caps ar
 owner-confirmed, not independently verified; spend is unknown. Only scripts/bench/runner.exs
 is coder work; library, tests, fixtures and README/SPEC are unchanged by the loop. The loop
 had not started at this checkpoint.
+
+BENCH-1: implemented the public-API throughput runner in scripts/bench/runner.exs only: nine chained PLL workloads, exact count/status validation, fake-clock sample arithmetic with memory/VM-GC deltas, and the sequential main header/sample output; exported names, signatures and doc comments preserved.
+BENCH-1 evidence: mix format --check-formatted (including scripts/bench/*.exs and scripts/throughput.exs) passed; MIX_ENV=test mix compile --warnings-as-errors passed; task command 6/6 passed (seed 0 and 12345); mix test test/pll --seed 0 66/66; mix test --seed 0 72/72; mix run scripts/throughput.exs --smoke exit 0 with 18 sample rows across all nine workloads; bad option exit 2. Issuance units use observed Pacer.next_due cursor deltas because Span fields are private; no protected file, dependency or private/outside reference was read or changed.
+BENCH-1 remaining/blocker: none for this task; not committed or marked done, loop.sh --check not run, and the runner alone judges and commits. Timing values are local finite-run evidence only, with no thresholds or speed claims.
