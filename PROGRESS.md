@@ -81,3 +81,31 @@ S2-mapping blocks: none for this task; S2-loop must replace the anchored observe
 S2-loop
 S2-loop changed: lib/pll/follower_core.ex implements later-reading observe: order check (local >= last local, remote > last remote); window_ns>0 and unrounded old-mapping abs(e) > outlier_threshold_ns return the temporary unsupported error with no state change; accepted inliers update the mapping only when dt>0 (capped gain/rate, rounded displacement anchor, overflow-checked), then lock run and two-sample jitter. Evidence: follower_loop_test 9/9 (seed 0); format check and warnings-as-errors compile passed; whole tree 55/55; a scratch 60,000-observe fuzz (not in repo) raised no exceptions. Only lib/pll/follower_core.ex and PROGRESS.md changed; no protected file, test or dependency touched; no private reference, external implementation or Go source consulted.
 S2-loop remaining/blocks: no new contract gap and no blocker found; Stage 3 windows/outliers/steps stay deferred and the temporary unsupported boundary remains; task judgment and commit are left to the runner.
+
+# Stage 3 preparation checkpoint (not a runnable kit)
+Stage 3 kit preparation is approved; no implementation loop before parent review.
+Current baseline at e3352c2 independently passes format/compile/55 tests/all seven
+runner checks. Created kit/stage3-follower-parity from that clean actual build.
+Added draft private-history seam/stub and six history tests; replaced only temporary
+Stage 2 unsupported expectations with final normative successful transitions.
+Draft external reference passes 61 tests; supplied stubs pass 53/61 and all 46 prior
+pacing/config/mapping checks. Full Stage 3 kit verification is NOT complete.
+Paused per parent direction pending owner fixture encoding/temp harness approval.
+No harness/model launch, encoding decision, partial kit commit, install or sibling
+write. See docs/stage3-checkpoint.md for exact evidence, reference path and remaining
+work. Historical Stage 2 SPEC/tasks/PROMPT are not Stage 3 launch instructions.
+
+# Stage 3 verified overlay kit — parent review before implementation loop
+Owner explicitly approved dependency-free decimal-integer/hex-binary64 lines and
+separate temporary offline public-Go generation leaving ../pll untouched. Preparation
+resumed from preserved checkpoint; no additional model/coder calls occurred.
+Final scope/ownership, superseded temporary assertions and verification are recorded
+in docs/stage3-verification.md; corpus schema/provenance in docs/corpus.md. Prior
+checkpoint scratch was incorporated there, not shipped as contradictory instructions.
+Supplied stubs: 53/66 tests pass, 13 expected failures; 46 prior pacing/config/mapping
+checks pass. External reference over actual Stage 2: 66 tests and every unchanged
+runner task pass. Both new S3 tasks fail stubs; task IDs preserve historical attempts.
+Generator run twice offline yields identical 172-line/159-record pinned public corpus;
+Go sibling stays clean. Mechanics: 26 pass/26 mutations caught, runner unchanged.
+Original $25 total not expanded; caps owner-confirmed, spend unknown. No implementation
+loop before parent review; no installs/remotes/publication/later kits.

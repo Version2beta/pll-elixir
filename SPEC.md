@@ -1,114 +1,90 @@
-# Stage 2 supporting contract — bounded mapping and inlier loop
+# Stage 3 supporting contract — complete follower overlay
 
-Subordinate to approved root README.md: Decisions/temporary Stage 2 boundary,
-Public API, Types/bounds/errors, Follower configuration, Follower state machine,
-Queries and Ownership. README wins; conflicts/new promises block work.
+Subordinate to root README.md: Public API; Types/bounds/errors; Exact pacer;
+Follower configuration; Follower state machine; Queries/rounding/holdover/reset;
+Ownership/effects; Deterministic verification contract. README wins. New
+contract gaps block work and require review, not implementation guesses.
 
-## Approved scope and seams
+## Scope and complete seams
 
-Preserve every Stage 1 guarantee unchanged. Add config, anchoring, ordering,
-mapping/rounding, gain/rate updates, accepted inliers, lock/jitter/holdover/reset,
-transactional overflow and first follower-to-pacer example. No dependencies,
-I/O, implicit clocks, process/global state, adapters, installs or publication.
-Stage 3 windows/outliers/steps and Go parity corpus remain deferred. The follower
-is not complete. No task may implement Stage 3 or assume a fixture encoding.
+Overlay actual Stage 2 at e3352c209a2ba75359018f579643d7debc265382. Preserve its
+config/mapping/inlier arithmetic and all Stage 1 behavior. Complete windows,
+outlier runs/steps, pending/rejected order, exact elapsed comparisons, atomic
+flush rollback and reset histories. No dependencies or runtime I/O, clocks,
+processes, credentials, implicit environment or adapters.
 
-All supplied public modules/data types are complete and protected. Follower
-carries config plus immutable mapping/reference/order/lock/jitter data, not a
-serialized format. Unsupported forged structs need not work. New private helpers
-are allowed, but only FollowerCore and new helper files are implementation work;
-all Stage 1 source is protected, with no unrelated refactor. Exported names,
-signatures/docs stay fixed. Config.default does not validate nominal. Config
-validation follows README table order, including all fields deferred in use.
+Only lib/pll/follower_history.ex and new private helper modules are coder work.
+FollowerCore is now complete/protected: observe validates kind/scalars/order,
+anchors first readings for every config, then delegates subsequent observations.
+Its history_error/3 and history_inlier/4 adapters expose existing arithmetic
+without promising new public library API. Follower's window/outlier fields are
+private representation, not serialization or public mutation promises. Reset
+already restores their defaults. Preserve names/specs/docs of supplied seams.
 
-Implement exact error shapes with nil field/reason except config errors. Wrong
-state kinds raise ArgumentError. Scalar types/envelopes validate left-to-right
-before semantics. Observe then checks existing order, then unsupported boundary:
-window_ns>0 always unsupported, including first anchor; window=0 first reading
-anchors; later abs(unrounded e)>float(outlier_threshold_ns) unsupported. No
-metadata changes or replacement state on any failure. Otherwise feed the inlier.
-No fabricated pending/rejected/stepped behavior in this stage. Error message is
-`pll: unsupported in Stage 2`. Remove this temporary boundary only in Stage 3.
+Implement FollowerHistory.observe/3's supplied signature. Return only a tagged
+error on failure, never a replacement state. Validate input only through existing
+core dispatch. Successful pending/rejected calls consume input order; failed
+calls consume nothing. Window flush returns candidate error/status, then opens
+trigger candidate against updated mapping. Half-open elapsed comparisons are
+exact integers across signed limits. Candidate selection is strictly smaller
+signed unrounded error; ties keep earlier. Compare unrounded phase-domain errors
+to binary64 thresholds, including outlier-run distance to FIRST error, not last.
+Step retains y, reanchors exactly and clears lock/jitter/outlier history. Inlier
+run clearing occurs only after successful feed. Never mutate supplied snapshots.
+Use complete stable arithmetic, including its tagged overflow and exact-anchor
+mapping. No broad previous-stage refactor is allowed.
 
-Use README equations and rounding of displacement, not absolute time. Subtract
-signed-fitting integer differences before conversion; wide differences use
-float(a)-float(b). Add rounded displacement exactly to integer anchors, allowing
-wide cancellation. Float-domain phase/lock comparisons convert integer thresholds
-to binary64, matching pinned Go follower.go outlier/lock comparisons (revision
-971282632129110794c9d6edd22026e9de2359be); envelopes/order/elapsed remain exact.
-At Imax threshold, binary64 e=-2^63 is an inlier and its reported error saturates
-to Imin; this does not relax exact integer input bounds.
+Historical Stage 2 unsupported transitions are intentionally superseded ONLY
+for final windows/outliers/steps. Error.message(:unsupported) remains legacy
+compatibility for historical/manual error values; completed observe never emits
+that code. Supplied stubs still use it on unfinished paths; this is not a final
+API promise. No final normative behavior is changed.
 
-Evaluate gain caps without overflowing BEAM float products or reciprocals:
-all finite positive bandwidth/damping are valid, including subnormals and max
-binary64. Private helper algorithms are local freedom, not changed equations.
-Check new integer anchor before exposing any transition. dt=0 leaves mapping,
-rate and reference unchanged but updates accepted/lock/jitter/order data.
-Jitter uses unrounded errors and requires two inliers before a nonzero getter.
-Holdover is a query only; reset retains config but clears all learned history.
-No hidden runtime effects or dependencies. Elixir 1.20.4 / OTP29 is the verified
-machine, not a claim of wider runtime acceptance.
+## Promise mapping and ordered tasks
 
-## Promise-to-test mapping and tasks
+| README promise | Protected checks | Task/count |
+| --- | --- | --- |
+| Rate factories/strings/envelopes | rate_test | T1 / 9 |
+| Pacer/Span exact issuance/lazy snapshots/examples | pacer_test, span_test, readme_test | T2 / 21 |
+| Trim and independent rational oracle | trim_test, model_test, rational_oracle_helper | T3 / 8 |
+| All config defaults/validation/status/error strings | follower_config_test | S2-config / 4 |
+| Signed mapping/ties/large anchors/wide cancellation | follower_mapping_test | S2-mapping / 4 |
+| Prior inlier equations, dt=0, gain extremes, offset clamps, jitter, holdover, rollback, trim integration; temporary cases replaced by final classifications | follower_loop_test, follower_equation_oracle_helper | S3-history / 9 |
+| Windows signed minima/ties/boundaries, post-flush candidate, first outlier reference/equality/run reset, steps keep rate, signed elapsed, overflow retry/reset, README table workflows | follower_history_test | S3-history / 7 |
+| Independent integer histories over 1203 seeded readings; synthetic drift/jitter/jumps/outage and pacer steering over 1200 readings | follower_synthetic_test, history_oracle_helper | S3-history / 2 |
+| Public pinned Go classifications/error/state/mapping/offset/trim/jitter and reset | go_corpus_test, go_corpus_helper, fixtures/go_public_v1.txt | S3-history / 1 |
+| All three public executable README fences, plus final outlier path | readme_fences_test | S3-history / 1 |
+| Whole tree, formatted and warnings-as-errors | all discovered tests | S3-tree / 66 |
 
-| README guarantee | Protected checks / task |
-| --- | --- |
-| Stage 1 Rate factories, gcd, uint64 terms, strings, zero sentinel, validation/messages | rate_test.exs / T1, 9 tests |
-| Stage 1 exact due/floor/ceil, claims, skip, cursor U, bounds, empty/lazy spans, retained snapshots, pacing examples | pacer_test.exs, span_test.exs, readme_test.exs / T2, 21 tests |
-| Stage 1 trim/no-op/floor anchor/bounds and independent rational oracle | trim_test.exs, model_test.exs, rational_oracle_helper.exs / T3, 8 tests |
-| Full defaults, zero config, field order/reasons, types/both envelopes, finite extremes, status/state/error spelling | follower_config_test.exs / S2-config, 4 tests |
-| Anchoring, unanchored/scalar errors, wrong kinds, both envelopes, remote overflow, half ties, >2^53 anchors, true wide-difference cancellation and exact binary periods via integer oracle | follower_mapping_test.exs / S2-mapping, 4 tests |
-| Moderate independent equations, 240 updates, offset/mapping/jitter tolerance | follower_loop_test.exs + follower_equation_oracle_helper.exs / S2-loop |
-| dt=0, lock equality/clearing/default eight-sample chain, two-inlier jitter, exact holdover and reset config retention, immutable snapshots | follower_loop_test.exs / S2-loop |
-| Temporary unsupported paths, exact 1.25 ns unrounded outlier/lock classification, precedence and valid continuation, feed overflow rollback | follower_loop_test.exs / S2-loop |
-| Extreme finite gain combinations, cap/underflow, both offset clamp/trim saturations, Imax outlier/lock threshold/error/jitter saturation | follower_loop_test.exs / S2-loop |
-| First follower-to-pacer README workflow, failed transitions retain old states | follower_loop_test.exs / S2-loop, 9 tests total |
-| Formatting, warnings-as-errors, full discovered tree | S2-tree, 55 tests |
+T1–T3/S2-config/S2-mapping are retained. S2-loop's checks move into S3-history,
+so the historical ID's attempt metadata cannot collide with final behavior work.
+S2-tree is replaced by S3-tree, always last. No previous logs/state are deleted.
+All 46 prior pacing/config/mapping checks pass stubs. Both new S3 tasks must fail
+supplied unfinished paths and pass external reference via unchanged --check.
+Counts pin installed ExUnit summary, no skipped/excluded tests. Runtime changes
+require re-verification, not relaxed matching.
 
-T1–T3 unchanged; prior T4 is replaced, not left mid-list. Every new implementation
-task and final whole-tree check must fail delivered stubs. All prior Stage 1
-checks pass on those stubs. All tasks must pass the unchanged runner --check on
-a private reference overlaid onto the ACTUAL Stage 1 implementation. Expectations
-pin installed ExUnit stdout counts with no skips/exclusions. Checks launch no
-coder/model or network calls. Different summary/runtime requires re-verification,
-not weakening expectations. No test claims the entire follower is complete.
+The independent integer history oracle uses period 1 ns and effectively zero
+loop gains at bounded inputs, integer shifts and a literal error-run list; it
+shares no production helpers. It isolates history transitions rather than
+claiming full float-loop independence. Prior moderate equation and exact mapping
+oracles remain in force. Synthetic clocks are deterministic, not live integration.
+Corpus schema/provenance/tolerances are in docs/corpus.md. Classifications exact;
+no tolerance may mask thresholds/ties. Finite fixtures do not prove universal
+cross-language parity or arbitrary-distance accuracy.
 
-The moderate oracle implements literal equations independently, without production
-helpers/structs; tolerance <=1ns error/mapping, <=1e-12 offset, <=2ns jitter.
-Exact integer boundary fixtures do not use these tolerances. Extreme-gain checks
-use hand-derived cap limits: x=0.5 for max bandwidth, x effectively zero for
-subnormal bandwidth at these dt values; kp=1 only when capped x and max damping.
-Expected offset is -0.25/1.001*0.001, tolerance 1e-15. Overflow-safe arithmetic
-was experimentally checked before building these tests; test evidence is local
-feasibility, not universal binary64 identity or arbitrary-distance accuracy.
+## Protection and local freedom
 
-## Protected inventory and gate
+Protect every README, all docs/contracts, tests/support/fixtures, generator,
+runner, configs, Mix/formatter/.gitignore/LICENSE and every existing module
+except FollowerHistory. Complete public structs/parser/arithmetic adapters are
+protected. Private helper names/algorithms are local freedom; no public surface
+change or dependencies. PROMPT prohibits private reference/external implementation
+reads. Process permissions are not a security sandbox; isolate credentials before
+any later authorized paid run.
 
-Protect every root/nested README, SPEC.md, PROMPT.md, tasks.json, scripts/loop.sh,
-all test/support files, config/, mix.exs, .formatter.exs, .gitignore, LICENSE,
-all Stage 1 modules (including cores), plus follower/config/observation/status/
-state public seams. PROGRESS.md and follower_core.ex/new implementation helpers
-remain writable. Inventory must be checked against JSON-decoded grep EREs.
-Private references/evidence stay outside the coder checkout; coder must not read
-outside implementations/references, including sibling repositories. Existing
-.loop attempt state is preserved; new IDs are S2-prefixed and collision-free.
-
-Parent review of this kit is complete. The authorized Stage 2 run completed once
-(exit 0): S2-config, S2-mapping and S2-loop each passed on a first claude-haiku-5-5
-attempt, and S2-tree passed the judge without a coder attempt. The original $25
-constraint is unchanged and not expanded. Caps are owner-confirmed, not independently
-verified; total spend is unknown. No further loop, Stage 3, remotes, installs or
-later kits are authorized.
-Reference/fixture results are not coder implementation, complete parity, live
-integration, performance, security or real-use acceptance. A contract blocker
-must stop the run through the harness; progress notes alone cannot stop retries.
-
-Review strengthening retained the same natural test groups/counts (4 config,
-4 mapping, 9 loop, 55 whole-tree). A period of 1.25ns gives e=-1.25 while the
-reported error rounds to -1; it must be unsupported at outlier threshold 1 and
-accepted but acquiring at lock threshold 1/count 1. Independent reference
-mutations that classify using round(e) instead each fail this protected case.
-True wide mapping fixtures subtract 0-Imin=2^63 before converting to binary64,
-then cancel with integer base -10 to return 9223372036854775798; the older Imax
-fixture remains separately labeled as signed-fitting difference rounding.
-These are checks of existing contract, not additional runtime behavior.
+Stage 3 preparation/verified-kit commit approved. Encoding and temporary offline
+public-Go harness explicitly approved; source read-only, no dependency fetches.
+No implementation loop before parent review. Original $25 total unchanged;
+caps owner-confirmed, not independently verified, spend/remaining unknown.
+Publication, broader runtime matrix and products/adapters remain deferred.

@@ -3,8 +3,8 @@ Implement only the supplied task, from these repository files.
 1. Read the approved README.md (including Decisions and stage limitations),
    subordinate SPEC.md, and PROGRESS.md. README authority wins; contradictions
    or newly required contract decisions are blockers, not implementation freedom.
-2. Implement the task in lib/pll/follower_core.ex or new private helper files only.
-   All Stage 1 source is protected; do not refactor it. Preserve every supplied exported name, spec and doc comment.
+2. Implement the task in lib/pll/follower_history.ex or new private helper files only.
+   All prior source including FollowerCore is complete and protected; do not refactor it. Preserve every supplied exported name, spec and doc comment.
    Keep passing behavior unless the task requires its extension. No
    dependency, CLI, clock, process, environment, I/O or network functionality.
 3. Never edit any approved README (including nested READMEs), SPEC.md, tests,

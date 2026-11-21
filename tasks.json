@@ -11,7 +11,10 @@
     "^\\.formatter\\.exs$",
     "^\\.gitignore$",
     "^LICENSE$",
-    "^lib/pll/(follower|follower_config|observation|status|state|rate_core|pacer_core|span_core|segment_core)\\.ex$"
+    "^lib/pll/(follower|follower_config|observation|status|state|rate_core|pacer_core|span_core|segment_core)\\.ex$",
+    "^docs/",
+    "^scripts/corpus/",
+    "^lib/pll/follower_core\\.ex$"
   ],
   "tasks": [
     {
@@ -60,20 +63,20 @@
       "tier": "normal"
     },
     {
-      "id": "S2-loop",
-      "title": "Inlier equations, lifecycle, unsupported boundary and pacer trim",
-      "test": "mix test test/pll/follower_loop_test.exs --seed 0",
+      "id": "S3-history",
+      "title": "Complete follower histories, parity and deterministic integration",
+      "test": "mix test test/pll/follower_loop_test.exs test/pll/follower_history_test.exs test/pll/follower_synthetic_test.exs test/pll/go_corpus_test.exs test/pll/readme_fences_test.exs --seed 0",
       "expect": [
-        "^Result: 9 passed$"
+        "^Result: 20 passed$"
       ],
       "tier": "normal"
     },
     {
-      "id": "S2-tree",
-      "title": "Whole tree: all prior guarantees plus bounded Stage 2",
+      "id": "S3-tree",
+      "title": "Final stage whole tree: format, compile and every regression",
       "test": "mix format --check-formatted && MIX_ENV=test mix compile --warnings-as-errors && mix test --seed 0",
       "expect": [
-        "^Result: 55 passed$"
+        "^Result: 66 passed$"
       ],
       "tier": "normal"
     }

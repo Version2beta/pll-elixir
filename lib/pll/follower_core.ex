@@ -1,8 +1,9 @@
+# complete; do not change
 defmodule PLL.FollowerCore do
   @moduledoc false
-  # Stage 2 follower core. S2-config: new/1. S2-mapping: anchoring, scalar
-  # validation, signed mapping and state/getter queries. S2-loop: later readings
-  # (order, temporary unsupported boundary, inlier feed, lock and jitter).
+  # Stable Stage 2 config/mapping/inlier arithmetic; Stage 3 history integration
+  # delegates only validated, ordered subsequent samples to FollowerHistory.
+  # Protect this complete core in the final Stage 3 task inventory.
 
   # README signed 64-bit envelope for integer config fields.
   @imin -9_223_372_036_854_775_808
@@ -133,39 +134,23 @@ defmodule PLL.FollowerCore do
   def reset(%PLL.Follower{config: config}), do: %PLL.Follower{config: config}
   def reset(_follower), do: raise(ArgumentError, "expected PLL.Follower")
 
-  # Stage 2 boundary: a window is unsupported even for the first anchor.
-  defp observe_valid(%PLL.Follower{anchored: false} = follower, local_ns, remote) do
-    if follower.config.window_ns > 0 do
-      {:error, %PLL.Error{code: :unsupported}}
-    else
-      {:ok, anchor(follower, local_ns, remote), %PLL.Observation{status: :anchored, error_ns: 0}}
-    end
-  end
+  # Stage 3 owns only observe integration/history. Stable arithmetic stays here.
+  defp observe_valid(%PLL.Follower{anchored: false} = follower, local_ns, remote),
+    do: {:ok, anchor(follower, local_ns, remote), %PLL.Observation{status: :anchored}}
 
-  # Later readings: order is checked first, then the Stage 2 boundary, then the feed.
   defp observe_valid(%PLL.Follower{} = follower, local_ns, remote) do
     if local_ns < follower.last_local or remote <= follower.last_remote do
       {:error, %PLL.Error{code: :order}}
     else
-      observe_later(follower, local_ns, remote)
+      PLL.FollowerHistory.observe(follower, local_ns, remote)
     end
   end
 
-  # Windows are unsupported in Stage 2 for every later reading.
-  defp observe_later(%PLL.Follower{config: %{window_ns: window}}, _local_ns, _remote)
-       when window > 0,
-       do: {:error, %PLL.Error{code: :unsupported}}
+  # Complete adapter to stable Stage 2 arithmetic, not a new public library API.
+  def history_error(follower, local_ns, remote), do: phase_error(follower, local_ns, remote)
 
-  # Unrounded old-mapping phase error decides the temporary outlier boundary.
-  defp observe_later(%PLL.Follower{} = follower, local_ns, remote) do
-    e = phase_error(follower, local_ns, remote)
-
-    if abs(e) > :erlang.float(follower.config.outlier_threshold_ns) do
-      {:error, %PLL.Error{code: :unsupported}}
-    else
-      feed_inlier(follower, local_ns, remote, e)
-    end
-  end
+  def history_inlier(follower, local_ns, remote, e),
+    do: feed_inlier(follower, local_ns, remote, e)
 
   # Accepted inlier: update the mapping (only when dt > 0), then lock and jitter data.
   defp feed_inlier(%PLL.Follower{} = follower, local_ns, remote, e) do

@@ -60,25 +60,24 @@ defmodule PLL.FollowerLoopTest do
     assert Follower.state(ext, @hi) == {:ok, :holdover}
   end
 
-  test "temporary unsupported paths preserve mapping and order with scalar precedence" do
+  test "final window anchoring, scalar precedence and outlier threshold equality" do
     {w, _} = fresh(%{window_ns: 1})
-
-    assert {:error, %Error{code: :unsupported, field: nil, reason: nil}} =
-             Follower.observe(w, 0, 0)
-
+    assert {:ok, _, %{status: :anchored}} = Follower.observe(w, 0, 0)
     assert {:error, %Error{code: :overflow}} = Follower.observe(w, @hi + 1, 0)
     assert {:error, %Error{code: :invalid_argument}} = Follower.observe(w, nil, @hi + 1)
     assert {:error, %Error{code: :not_anchored}} = Follower.local(w, 0)
-    assert {:error, %Error{code: :unsupported}} = Follower.observe(Follower.reset(w), 0, 0)
+    assert {:ok, _, %{status: :anchored}} = Follower.observe(Follower.reset(w), 0, 0)
     {f, _} = anchor(%{outlier_threshold_ns: 1_000_000})
-    assert {:error, %Error{code: :unsupported}} = Follower.observe(f, 10_000_001, 9)
-    assert Follower.local(f, 9) == {:ok, 9_000_000}
-    # Failed input does not consume order; equality threshold is an inlier.
+    assert {:ok, rejected, %{status: :rejected}} = Follower.observe(f, 10_000_001, 9)
+    assert Follower.local(rejected, 9) == {:ok, 9_000_000}
+    assert {:error, %Error{code: :order}} = Follower.observe(rejected, 10_000_000, 10)
+
     assert {:ok, g, %{status: :accepted, error_ns: 1_000_000}} =
              Follower.observe(f, 10_000_000, 9)
 
     assert {:error, %Error{code: :order}} = Follower.observe(g, 9_000_000, 10)
     assert {:error, %Error{code: :order}} = Follower.observe(g, 20_000_000, 9)
+    # Historical message compatibility only; final transitions never emit it.
     assert Error.message(%Error{code: :unsupported}) == "pll: unsupported in Stage 2"
   end
 
@@ -189,13 +188,13 @@ defmodule PLL.FollowerLoopTest do
     {:ok, z} = Follower.new(c)
     {:ok, z, _} = Follower.observe(z, 0, 0)
     assert {:ok, _, %{error_ns: -1}} = Follower.observe(z, 0, 1)
-    assert {:error, %Error{code: :unsupported}} = Follower.observe(z, 0, 3)
+    assert {:ok, _, %{status: :rejected, error_ns: -2}} = Follower.observe(z, 0, 3)
     # Exact 1.25ns distinguishes unrounded classification from round-away(-1.25)=-1.
     {:ok, r} = Rate.units_per_second(800_000_000, 1)
     c = %{FollowerConfig.default(r) | outlier_threshold_ns: 1}
     {:ok, z} = Follower.new(c)
     {:ok, z, _} = Follower.observe(z, 0, 0)
-    assert {:error, %Error{code: :unsupported}} = Follower.observe(z, 0, 1)
+    assert {:ok, _, %{status: :rejected, error_ns: -1}} = Follower.observe(z, 0, 1)
     c = %{FollowerConfig.default(r) | lock_threshold_ns: 1, lock_count: 1}
     {:ok, z} = Follower.new(c)
     {:ok, z, _} = Follower.observe(z, 0, 0)

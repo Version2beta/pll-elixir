@@ -1,9 +1,9 @@
 # pll-elixir — exact pacing and clock following
 
-> **Approved design; Stage 1 implemented; Stage 2 config, mapping and inlier loop implemented by the authorized bounded run.**
-> The Stage 2 follower is limited, not complete: the window/outlier boundary below
-> is temporary until Stage 3, and windows, outliers and steps are not implemented.
-> Current gate: author review of the completed Stage 2 run; no further loop, Stage 3 or later kit is authorized.
+> **Stage 3 overlay kit prepared for parent review; no implementation loop launched.**
+> Stage 1 and bounded Stage 2 are implemented. Supplied Stage 3 history paths are
+> intentionally unfinished. The full normative follower contract below is unchanged.
+> Stage 2 run limitations/approvals below are historical, not current launch authority.
 
 This library helps audio/video, sensor, packet and device-buffer applications
 pace units on their own timeline or learn the relationship to another clock.
@@ -26,23 +26,25 @@ They work separately or together: follower trim can steer a pacer.
 | Approved | Stage 1 implementation loop authorized: Haiku-5.5 for normal first attempts; gpt-6.1-sol high for the second attempt; gpt-6.1-sol max for the final attempt, using the exact commands below with MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Total budget $25. That Stage 1 authorization did not authorize later kits; Stage 2 preparation is separately approved below. |
 | Approved | Provider-side spending cap: owner-confirmed as configured for this $25 budget. Not independently verified. The unchanged runner does not enforce, track or aggregate dollars; it bounds attempts and time only. |
 | Superseded | Stage 2 kit preparation and kit commit only; launch then required parent review. Superseded by the Stage 2 run decisions below. No increased $25 budget, installs/remotes/publication/Stage 3 or preparation model calls. |
-| Approved | Parent review of the verified Stage 2 kit (kit commit `67813b6`) is complete. The Stage 2 implementation loop is authorized with the exact commands in the Stage 2 kit operation section: Haiku-5.5 for normal first attempts, gpt-6.1-sol high for the second attempt and gpt-6.1-sol max for the final attempt, using MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Prior permissions continue for runner commits of passing attempts and discards of only attempt-owned failed changes. The original $25 total budget is not expanded. Stage 3, later kits, installs, remotes and publication are not authorized. |
+| Approved | Parent review of the verified Stage 2 kit (kit commit `67813b6`) is complete. The Stage 2 implementation loop is authorized with the exact commands in the Stage 2 kit operation section: Haiku-5.5 for normal first attempts, gpt-6.1-sol high for the second attempt and gpt-6.1-sol max for the final attempt, using MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Prior permissions continue for runner commits of passing attempts and discards of only attempt-owned failed changes. The original $25 total budget is not expanded. That run did not authorize Stage 3; its separate preparation approval follows. Later kits, installs, remotes and publication remain unauthorized. |
 | Approved | Stage 2 provider-side spending caps: owner-confirmed as configured. Not independently verified. The unchanged runner does not enforce, track or aggregate dollars; total spend and remaining funds are unknown. |
-| Approved | Temporary Stage 2 unsupported observe boundary described below preserves state for windowed/outlier observations rather than inventing partial window/outlier behavior. Final Stage 3 contract is unchanged. |
+| Superseded | Temporary Stage 2 unsupported observe boundary described below preserves state for windowed/outlier observations rather than inventing partial window/outlier behavior. Final Stage 3 contract is unchanged. |
+| Approved | Stage 3 overlay kit preparation and verified complete kit commit only, followed by parent review before any coding loop. Complete windows/outliers/steps, edge/retry cases, deterministic synthetic integration, public-Go differential corpus and all examples/regressions. Prior runner commit/discard permissions remain scoped to passing attempts/attempt-owned failures. No preparation model calls, installs, remotes, publication or later kits. Original $25 total is not expanded; caps remain owner-confirmed, not independently verified, spend unknown. |
+| Approved | Dependency-free line-oriented corpus with decimal integers and hex binary64; separately authorized temporary offline generator against the pinned public Go API, leaving ../pll untouched. No network or dependency fetches. |
 | Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
 | Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and benchmarks; decide before the affected stage. No task may assume them. |
 
-**Current gate: author review of the completed Stage 2 run.** Stage 1 remains
-implemented. The authorized Stage 2 runner exited 0 after `every task passes`:
-S2-config, S2-mapping and S2-loop each passed on the first `claude-haiku-5-5`
-attempt, and the S2-tree whole-tree judge passed with no coder attempt. No
-`gpt-6.1-sol` escalation or `STOP` occurred. No further loop is authorized. The
-original $25 constraint is unchanged and not expanded. Provider-side caps are
-owner-confirmed, not independently verified; the runner does not track dollars, and
-total spend and remaining funds are unknown. No installs, remotes, publication,
-Stage 3 or later kits are authorized.
+**Current gate: parent review of the verified Stage 3 kit, before any coding loop.**
+See [Stage 3 verification](docs/stage3-verification.md) and operation commands at
+end of this README. The original total $25 constraint is unchanged; provider caps
+are owner-confirmed, not independently verified, and spend/remaining are unknown.
 
-### Temporary Stage 2 execution boundary (approved)
+The following temporary boundary is historical Stage 2 provenance only. Stage 3
+supersedes its emissions without changing the final normative contract. The legacy
+unsupported message remains for historical/manual error values; completed final
+observe paths never emit unsupported.
+
+### Historical temporary Stage 2 execution boundary (approved then; superseded in Stage 3)
 
 The final follower contract below remains normative for the finished library.
 Stage 2 implements only config, mapping and the inlier loop. It is **not a
@@ -111,7 +113,7 @@ After implementation, a **proposed local consumer dependency** is:
 
 From the future consumer project, `mix deps.compile pll` would compile that
 local dependency; from this library root, `mix compile` builds the Stage 1 exact
-pacing modules. Stage 2 config, mapping and inlier-loop seams are implemented (Stage 2-limited); windows, outliers and steps return the temporary unsupported error until Stage 3. No installs or fetches are
+pacing modules. Stage 2 config, mapping and inlier-loop seams are implemented; supplied Stage 3 history stubs still fail on unfinished windows/outliers/steps. No installs or fetches are
 authorized. No Hex version/install command is promised; publication availability
 has not been checked. Compiling can write build
 artifacts, but the library runtime has no file effects.
@@ -544,12 +546,11 @@ processes and write `_build`/compiler caches; format can write sources. Such
 explicit development-tool effects do not contradict the runtime contract.
 The deterministic checks require no network or credentials.
 
-## Deterministic verification contract (Stage 1 and bounded Stage 2 checks)
+## Deterministic verification contract
 
 Use ExUnit and builtin arithmetic; no added testing dependency. Stage 1
 source-named suites cover Rate, Pacer, Span, an independent rational oracle and
-pacing README examples. Stage 2 adds config/mapping/inlier-loop checks; shared Go differential fixtures and
-complete windows/outliers remain deferred. Commands from this project root (Stage 1 suites pass on
+pacing README examples. Stage 2 adds config/mapping/inlier-loop checks; Stage 3 adds shared public-Go fixtures and complete windows/outliers checks. Commands from this project root (Stage 1 suites pass on
 this checkout):
 
 ```sh
@@ -593,12 +594,12 @@ Acceptance must cover:
    Encode integers as decimal strings, floats as binary64 encodings; record
    operations, results/error codes and source revision. Replay both ports
    against this and independent oracles. Since OTP 26 has no built-in JSON
-   requirement here, choose an approved dependency-free fixture encoding before
-   that kit (a simple line-oriented text format is sufficient). Two ports
+   requirement here, the approved line-oriented decimal-integer/hex-binary64 encoding is documented
+   in docs/corpus.md. Two ports
    agreeing is not independent proof; investigate discrepancies with source
    equations and hand-worked cases.
 
-Approved numerical acceptance (full follower verification remains future): exact
+Approved numerical acceptance (Stage 3 reference evidence is not implementation acceptance): exact
 pacer integers, classifications/statuses,
 states, saturation and designated hand-derived boundary mappings. Moderate
 follower-model fixtures mirroring source differential tests allow <=1 ns error
@@ -639,7 +640,7 @@ written by the runner's coder and judged by the unchanged runner and Mix command
 that is not owner, live-model or integration acceptance. There is no completed port,
 installed/published package, complete follower verification, Go differential corpus,
 performance result, live-model trial or real-device validation. Source Go
-results are not port evidence. The current gate is author review of the completed Stage 2 run; no Stage 3 is authorized.
+results are not port evidence. That was the historical Stage 2 gate; Stage 3 preparation is now separately approved.
 
 **Kit-preparation evidence (historical, before the run; Elixir 1.20.4 / OTP 29):**
 unchanged runner `--check` passed all four tasks on the private reference: 9, 21,
@@ -651,7 +652,7 @@ otherwise working reference with set_trim stubbed. Inherited disposable runner
 regressions: all 26 cases pass and all 26 deliberately regressed copies are
 caught, with no model calls. These are fixture/reference results only.
 
-**Owner-checkout implementation evidence (current):** the runner's coder made three
+**Owner-checkout Stage 1 implementation evidence (historical run):** the runner's coder made three
 first-attempt commits with `claude-haiku-5-5`: T1 `792e3f8`, T2 `7b4603e`, T3
 `d999aac`. No `gpt-6.1-sol` escalation or `STOP` occurred. T4, the whole stage,
 passed the runner's judge without a coder attempt. At implementation commit
@@ -661,7 +662,7 @@ passed the runner's judge without a coder attempt. At implementation commit
 and judge commands on this machine and toolchain. It is not owner acceptance,
 live-model, integration or real-use validation. Total model spend is unknown.
 
-**Owner-checkout Stage 2 implementation evidence (current, Stage 2-limited):** the
+**Owner-checkout Stage 2 implementation evidence (historical run, Stage 2-limited):** the
 authorized runner's coder made three first-attempt commits with `claude-haiku-5-5`:
 S2-config `cd8b3ea`, S2-mapping `b1e9249` and S2-loop `ec3aa37`, each with a
 `Coder-Command:` trailer for the Haiku command. The S2-tree whole-tree task then passed
@@ -746,7 +747,7 @@ by kit preparation or `--check`. The completed run made three coder calls, all
 `claude-haiku-5-5` first attempts. Its total spend is unknown from this checkout and
 must be checked against the provider's usage record.
 
-## Stage 2 kit operation (development only, not library API)
+## Historical Stage 2 kit operation (completed, not current launch instructions)
 
 Prepared directly on `kit/stage2-mapping-loop`, overlaying the actual Stage 1
 implementation at `049e0ca5a6128954870a59ebcbf25db29a6b294a`; no archive to apply.
@@ -812,3 +813,58 @@ Local freedoms: private arithmetic/helper organization within fixed data/public
 seams; no Stage 1 refactoring or dependencies. Deferred until Stage 3: window,
 outlier, step histories and shared Go fixture encoding/corpus; wider runtime,
 release/publication and adapters need later review. New contract gaps block work.
+
+## Stage 3 kit operation (current preparation; parent gate before launch)
+
+Prepared directly on `kit/stage3-follower-parity`, over actual Stage 2 commit
+`e3352c209a2ba75359018f579643d7debc265382`; no archive to apply. The kit includes
+intentional unfinished FollowerHistory paths, not the external private reference.
+No implementation loop has run. Prior .loop logs/attempts are preserved; S3 IDs
+avoid earlier attempt collisions. Historical S2-loop checks move into S3-history;
+S2-tree is replaced by the final S3-tree. Protected scope now includes complete
+FollowerCore, all previous stable modules, structs, tests, fixtures, parser,
+generator and READMEs. Only FollowerHistory/new private helpers are coder work.
+
+Prerequisites unchanged: installed Bash/Git/jq/timeout or gtimeout, Mix/Elixir/OTP;
+installed pi only for a later approved paid loop. No installs or dependency fetches.
+Verified runtime remains Elixir 1.20.4 / OTP29 only. Offline corpus generation is
+separately authorized and documented in [docs/corpus.md](docs/corpus.md); acceptance
+tests use the checked-in corpus and do not require Go or sibling source access.
+
+Review commands (no model calls):
+
+```sh
+git branch --show-current
+git status --short
+mix format --check-formatted
+MIX_ENV=test mix compile --warnings-as-errors
+mix test test/pll/rate_test.exs test/pll/pacer_test.exs test/pll/span_test.exs test/pll/readme_test.exs test/pll/trim_test.exs test/pll/model_test.exs test/pll/follower_config_test.exs test/pll/follower_mapping_test.exs --seed 0
+mix test --seed 0
+bash scripts/loop.sh --check
+```
+
+On delivered unfinished paths, 46 prior checks pass; S3-history and S3-tree must
+fail. On the external reference all tasks and 66 tests pass. Exact evidence,
+limitations and intentional supersession: [verification](docs/stage3-verification.md).
+No private reference may be copied into the coder checkout or read by the coder.
+
+**Do not execute before parent review.** Eventual exact command, without model
+substitution or increased budget:
+
+```sh
+MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \
+CHEAP_CMD='pi --provider anthropic --model claude-haiku-5-5 --thinking high --print --no-session' \
+STRONG_CMD='pi --provider openai-codex --model gpt-6.1-sol --thinking high --print --no-session' \
+STRONGEST_CMD='pi --provider openai-codex --model gpt-6.1-sol --thinking max --print --no-session' \
+bash scripts/loop.sh
+```
+
+Unchanged runner commits passing attempts on this non-main branch; discards ONLY
+attempt-owned failures. Logs/prompts/diffs/notes remain under .loop/; root STOP
+names an exhausted task. Never reset historical attempt state. PROGRESS.md is
+writable; contract gaps require operator stop/review, not speculative code or
+unattended retries. Normal first attempts Haiku5.5, retry high/max GPT6.1-sol.
+Original total $25 unchanged; caps owner-confirmed, not independently verified;
+spend/remaining unknown. Attempt/time limits do not enforce dollars. No preparation
+model calls, remotes, installs, publication or later kits. Runtime matrix/release
+and adapters remain deferred until separately reviewed.
