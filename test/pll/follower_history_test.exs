@@ -55,17 +55,47 @@ defmodule PLL.FollowerHistoryTest do
   end
 
   test "step keeps learned rate clears lock jitter and reset clears all histories" do
-    f = fresh(%{bandwidth_hz: 1.0, damping: 1.0, outlier_threshold_ns: 2_000_000, step_after: 1})
+    f =
+      fresh(%{
+        bandwidth_hz: 1.0,
+        damping: 1.0,
+        outlier_threshold_ns: 2_000_000,
+        lock_threshold_ns: 2_000_000,
+        lock_count: 1,
+        step_after: 1
+      })
+
     f = read(f, 1_001_000_000, 1_000_000_000, :accepted, 1_000_000)
+
+    assert {:ok, f, %{status: :accepted, error_ns: e}} =
+             Follower.observe(f, 2_002_000_000, 2_000_000_000)
+
+    assert e != 0
+    assert Follower.jitter(f) > 0
+    assert Follower.state(f, 2_002_000_000) == {:ok, :locked}
     y = Follower.offset(f)
-    assert {:ok, f, %{status: :stepped}} = Follower.observe(f, 2_000_000_000, 3_000_000_000)
+    assert {:ok, f, %{status: :stepped}} = Follower.observe(f, 3_000_000_000, 4_000_000_000)
     assert Follower.offset(f) == y
     assert Follower.jitter(f) == 0
-    assert Follower.state(f, 2_000_000_000) == {:ok, :acquiring}
-    assert Follower.local(f, 3_000_000_000) == {:ok, 2_000_000_000}
+    assert Follower.state(f, 3_000_000_000) == {:ok, :acquiring}
+    assert Follower.local(f, 4_000_000_000) == {:ok, 3_000_000_000}
+
+    assert {:ok, f, %{status: :accepted, error_ns: e}} =
+             Follower.observe(f, 3_000_000_000, 4_000_001_000)
+
+    assert e != 0
+    # first inlier after step, not third overall
+    assert Follower.jitter(f) == 0
     f = Follower.reset(f)
     assert Follower.offset(f) == 0.0
     assert {:ok, _, %{status: :anchored}} = Follower.observe(f, -1, -1)
+
+    # The same phase error after stepping starts a NEW outlier run.
+    f = fresh(%{outlier_threshold_ns: 10, step_after: 3})
+    f = read(f, 100, 80, :rejected, 20)
+    f = read(f, 120, 100, :rejected, 20)
+    f = read(f, 140, 120, :stepped, 20)
+    _f = read(f, 170, 130, :rejected, 20)
   end
 
   test "signed-boundary elapsed windows and holdover use exact integer subtraction" do
@@ -79,18 +109,32 @@ defmodule PLL.FollowerHistoryTest do
     assert Follower.state(f, 1) == {:ok, :holdover}
   end
 
-  test "window overflow rolls back candidate order outlier and permits valid continuation" do
-    f =
-      fresh(%{window_ns: 1, bandwidth_hz: 1.0e-300, damping: 1.0e-300, outlier_threshold_ns: @hi})
+  test "window overflow rolls back candidate and order and permits a valid flush" do
+    anchor = @hi - 1_000_000_000
 
-    f = read(f, @hi - 1, @hi - 2, :pending, 0)
-    assert {:error, %Error{code: :overflow}} = Follower.observe(f, @hi, @hi)
-    assert Follower.local(f, 0) == {:ok, 0}
-    # Failed trigger did not consume its input order. A same-time, later-remote
-    # pending reading is still valid on the supplied snapshot.
-    _continued = read(f, @hi - 1, @hi - 1, :pending, 0)
-    assert {:error, %Error{code: :overflow}} = Follower.observe(f, @hi, @hi)
-    assert {:ok, _, %{status: :anchored}} = Follower.observe(Follower.reset(f), 0, 0)
+    {:ok, rate} = Rate.units_per_second(1, 1)
+
+    config = %{
+      FollowerConfig.default(rate)
+      | window_ns: 999_999_999,
+        bandwidth_hz: 1.0,
+        damping: 1.0,
+        outlier_threshold_ns: @hi
+    }
+
+    {:ok, f} = Follower.new(config)
+    # At dt=1 ns gain is tiny: predicting remote=2 would overflow the anchor.
+    f = read(f, anchor, 0, :anchored, 0)
+    f = read(f, anchor + 1, 2, :pending, 0)
+    assert {:error, %Error{code: :overflow}} = Follower.observe(f, @hi, 4)
+    assert Follower.local(f, 0) == {:ok, anchor}
+    # Failed trigger did not consume order or candidate. The later in-window
+    # reading has a strictly smaller signed error and enough gain to fit.
+    continued = read(f, @hi - 1, 3, :pending, 0)
+    continued = read(continued, @hi, 4, :accepted, -2_000_000_001)
+    assert Follower.local(continued, 3) == {:ok, @hi - 1}
+    # The supplied snapshot still owns the original overflowing candidate.
+    assert {:error, %Error{code: :overflow}} = Follower.observe(f, @hi, 4)
   end
 
   test "trigger candidate error uses post-flush mapping and reset discards open window" do
@@ -99,7 +143,10 @@ defmodule PLL.FollowerHistoryTest do
     f = read(f, 20, 15, :accepted, 5)
     # Mapping moved +5 on flush: trigger's error is now 0, not old +5.
     f = read(f, 30, 25, :accepted, 0)
-    assert {:ok, _, %{status: :anchored}} = Follower.observe(Follower.reset(f), -10, -10)
+    f = read(Follower.reset(f), -10, -10, :anchored, 0)
+    f = read(f, -9, -9, :pending, 0)
+    f = read(f, 1, 1, :accepted, 0)
+    assert Follower.local(f, -9) == {:ok, -9}
   end
 
   test "README outlier and window workflows" do

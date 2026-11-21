@@ -34,7 +34,7 @@ replaced by S3-tree. No old logs/attempt metadata deleted.
   The seven original loop tests without temporary-path assertions also pass.
 - Unchanged runner --check: T1 9, T2 21, T3 8, S2-config 4, S2-mapping 4 pass
   supplied stubs; BOTH new tasks S3-history and S3-tree fail them.
-- External private reference in /tmp/pll-s3-reference.ifHtRB overlays this actual
+- External private reference outside the coder checkout overlays this actual
   build by replacing ONLY FollowerHistory. Format, compile, 66 tests and every
   task pass unchanged runner --check (S3-history 20; S3-tree 66).
 - All three alias-based public README fences are extracted/executed, not doctests;
@@ -59,16 +59,42 @@ replaced by S3-tree. No old logs/attempt metadata deleted.
   complete modules, project settings and automatically protected kit/runner paths.
   PROGRESS remains writable; only history/new private modules are unprotected.
 
-## Evidence files outside coder checkout
+## External evidence
 
-/tmp/pll-s3-reference-judge.out — passing reference runner output.
-/tmp/pll-s3-stub-judge.out — prior passes and two expected S3 failures.
-/tmp/pll-s3-stubs-final.out — 53/66 with 13 expected failures.
-/tmp/pll-s3-mechanics.out — 26 mechanics cases and regression catches.
-/tmp/pll-s3-mutation-{rolling-first,candidate-tie,absolute-candidate}.out.
-/tmp/pll-corpus-repeat.txt — repeat generation compared with protected fixture.
+Runner transcripts, stub failure output, corpus repeat comparison and mutation
+results are retained as external review evidence outside the coder checkout.
+Exact locations are provided only in the operator handoff, not coder-visible docs.
 Private reference stays outside coder checkout; PROMPT forbids reading it or any
 external implementation/sibling source during coder attempts.
+
+## Review strengthening
+
+The history step check now starts locked with two nonzero accepted inliers and
+nonzero jitter. It checks acquiring immediately after stepping, then jitter zero
+on the first nonzero post-step inlier. A separate three-outlier step followed by
+a similar outlier must reject rather than immediately step. Individual omissions
+of lock, jitter-count and outlier-run clears each fail the history suite (6/7)
+and the complete S3-history task (19/20). A reset retaining its old open window
+also fails both checks (6/7 and 19/20).
+
+The overflow test now retains the successful continuation and flushes its repaired
+candidate successfully, while the original snapshot still overflows. Reset is
+followed through a new pending window and successful boundary flush, making stale
+window retention observable. Synthetic oracle comparisons count statuses per
+window and include 400 explicit replay/order checks per configuration. Observed
+regular-reading counts (before those retries) are:
+
+| Window | Anchored | Accepted | Rejected | Stepped | Pending |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 1 | 325 | 70 | 5 | 0 |
+| 7 | 1 | 324 | 70 | 5 | 1 |
+| 25 | 1 | 112 | 15 | 6 | 267 |
+
+Assertions use nonzero/lower-bound coverage, not newly assumed exact model counts.
+Clean corpus trim was replayed with exact equality successfully; exact trim is now
+required for all records. Non-clean exact numerical fixture checks remain finite
+acceptance evidence, not a universal binary64 identity promise. Total test count
+stays 66 (S3-history 20); task IDs and protections unchanged. No coder/model launch.
 
 ## Limits and next gate
 

@@ -51,7 +51,7 @@ API promise. No final normative behavior is changed.
 | Signed mapping/ties/large anchors/wide cancellation | follower_mapping_test | S2-mapping / 4 |
 | Prior inlier equations, dt=0, gain extremes, offset clamps, jitter, holdover, rollback, trim integration; temporary cases replaced by final classifications | follower_loop_test, follower_equation_oracle_helper | S3-history / 9 |
 | Windows signed minima/ties/boundaries, post-flush candidate, first outlier reference/equality/run reset, steps keep rate, signed elapsed, overflow retry/reset, README table workflows | follower_history_test | S3-history / 7 |
-| Independent integer histories over 1203 seeded readings; synthetic drift/jitter/jumps/outage and pacer steering over 1200 readings | follower_synthetic_test, history_oracle_helper | S3-history / 2 |
+| Independent integer histories over 1203 seeded readings plus 1200 order retries; synthetic drift/jitter/jumps/outage and pacer steering over 1200 readings | follower_synthetic_test, history_oracle_helper | S3-history / 2 |
 | Public pinned Go classifications/error/state/mapping/offset/trim/jitter and reset | go_corpus_test, go_corpus_helper, fixtures/go_public_v1.txt | S3-history / 1 |
 | All three public executable README fences, plus final outlier path | readme_fences_test | S3-history / 1 |
 | Whole tree, formatted and warnings-as-errors | all discovered tests | S3-tree / 66 |

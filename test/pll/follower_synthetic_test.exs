@@ -20,27 +20,50 @@ defmodule PLL.FollowerSyntheticTest do
             lock_count: 10000
         })
 
-      Enum.reduce(0..400, {f, HistoryOracle.new(window)}, fn k, {f, m} ->
-        l = k * 10
-        r = k * 10 + div(k, 70) * 100 + rem(k * 7919, 19)
-        {n, status, e} = HistoryOracle.read(m, l, r)
+      {_, _, counts} =
+        Enum.reduce(0..400, {f, HistoryOracle.new(window), %{}}, fn k, {f, m, counts} ->
+          l = k * 10
+          r = k * 10 + div(k, 70) * 100 + rem(k * 7919, 19)
+          {n, status, e} = HistoryOracle.read(m, l, r)
 
-        f =
-          if status == :order do
-            assert {:error, %{code: :order}} = Follower.observe(f, l, r)
-            f
-          else
-            assert {:ok, next, %{status: ^status, error_ns: ^e}} = Follower.observe(f, l, r)
-            assert Follower.local(next, r) == {:ok, r + n.shift}
+          f =
+            if status == :order do
+              assert {:error, %{code: :order}} = Follower.observe(f, l, r)
+              f
+            else
+              assert {:ok, next, %{status: ^status, error_ns: ^e}} = Follower.observe(f, l, r)
+              assert Follower.local(next, r) == {:ok, r + n.shift}
 
-            assert Follower.state(next, l) ==
-                     {:ok, if(l - n.accepted > 50, do: :holdover, else: :acquiring)}
+              assert Follower.state(next, l) ==
+                       {:ok, if(l - n.accepted > 50, do: :holdover, else: :acquiring)}
 
-            next
-          end
+              next
+            end
 
-        {f, n}
-      end)
+          counts = Map.update(counts, status, 1, &(&1 + 1))
+
+          counts =
+            if k > 0 do
+              # Replay is an explicit invalid retry, compared to the independent model.
+              assert {^n, :order, 0} = HistoryOracle.read(n, l, r)
+              assert {:error, %{code: :order}} = Follower.observe(f, l, r)
+              Map.update(counts, :order, 1, &(&1 + 1))
+            else
+              counts
+            end
+
+          {f, n, counts}
+        end)
+
+      assert counts.anchored == 1
+      assert counts.accepted > 100
+      assert counts.rejected >= 15
+      assert counts.stepped >= 5
+      assert counts.order > 0
+
+      if window == 0,
+        do: assert(Map.get(counts, :pending, 0) == 0),
+        else: assert(counts.pending > 0)
     end
   end
 

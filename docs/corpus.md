@@ -11,7 +11,7 @@ Go build caches outside that source may be written. Tests never need Go.
 Reproduce from project root with installed Go and the pinned clean sibling:
 
 ```sh
-bash scripts/corpus/generate.sh /Users/rob/Development/pll > /tmp/pll-public.txt
+bash scripts/corpus/generate.sh /absolute/path/to/pinned-source > /tmp/pll-public.txt
 cmp test/fixtures/go_public_v1.txt /tmp/pll-public.txt
 ```
 
@@ -27,7 +27,8 @@ OP is O observe, Q query-only, R reset then query. Error calls retain old state.
 Unused/error values are zero, status none when no successful observation.
 Result codes ok/order/overflow/not_anchored. Queries always follow the operation
 using its same arguments; lifecycle queries use local. Floats encode output
-estimates, not an assumed bit-identical acceptance promise.
+estimates. Non-clean fixtures require exact numerical offset equality on this
+finite dataset; they do not promise universal bit-identical cross-runtime results.
 
 172 lines: header, 6 configs, 159 operation/query/reset records, 6 END lines.
 Scenarios clean/window/jump/fraction/signed/overflow include all five statuses,
@@ -36,8 +37,9 @@ window ties/boundaries, signed extremes and fractional threshold decisions.
 Generator and strict parser/schema/exact fixture are protected.
 
 Inspection: clean fixture uses approved moderate tolerances <=1 ns for observation
-and mapping, <=1e-12 offset, <=2 ns jitter. Trim difference <=1 ppt is bounded by
-rounding that offset at these moderate inputs. Other scenarios require exact
+and mapping, <=1e-12 offset, <=2 ns jitter. Trim is exact for every fixture,
+including clean: observed reference replay matches every public-Go trim result.
+Other scenarios require exact
 integers/float offset, including fractional classifications and signed boundaries.
 Statuses, error codes and lifecycle state are EXACT for all records. No tolerance
 relaxes a threshold or boundary. Both generated runs compare byte-for-byte.

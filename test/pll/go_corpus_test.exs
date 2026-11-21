@@ -53,7 +53,7 @@ defmodule PLL.GoCorpusTest do
         check_query(Follower.local(f, r), lc, lv, tolerance(name))
         check_query(Follower.remote(f, l), rc, rv, tolerance(name))
         assert abs(Follower.offset(f) - y) <= if(name == "clean", do: 1.0e-12, else: 0.0)
-        assert abs(Follower.trim(f) - trim) <= if(name == "clean", do: 1, else: 0)
+        assert Follower.trim(f) == trim
         assert abs(Follower.jitter(f) - jitter) <= if(name == "clean", do: 2, else: 0)
         assert Follower.state(f, l) == {:ok, String.to_existing_atom(state)}
         {f, name}

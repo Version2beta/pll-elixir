@@ -109,3 +109,14 @@ Generator run twice offline yields identical 172-line/159-record pinned public c
 Go sibling stays clean. Mechanics: 26 pass/26 mutations caught, runner unchanged.
 Original $25 total not expanded; caps owner-confirmed, spend unknown. No implementation
 loop before parent review; no installs/remotes/publication/later kits.
+
+# Stage 3 pre-launch review strengthening
+Test-only blocker addressed: step now starts locked with two nonzero inliers and
+nonzero jitter; poststep acquiring/first-inlier jitter and restarted outlier run
+are discriminated. Omitting lock/jitter-count/outlier clears individually fails.
+Valid continuation is flushed after overflow; reset open-window state is observed
+through a new boundary. Seeded oracle tests count classifications and add replay
+order checks. Exact clean corpus trim replay passed and tolerance is tightened to
+exact. Docs distinguish finite exact numerical fixtures from universal float
+identity and no longer disclose private reference/evidence locations. Counts remain
+66 total/20 S3-history. No coder/model calls; parent launch gate remains required.
