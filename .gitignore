@@ -1,0 +1,4 @@
+.loop/
+_build/
+# Existing transient agent metadata is preserved, not part of the kit.
+.wtha/

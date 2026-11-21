@@ -1,0 +1,52 @@
+{
+  "format": "mix format",
+  "format_check": "mix format --check-formatted",
+  "check": "MIX_ENV=test mix compile --warnings-as-errors",
+  "protected": [
+    "(^|/)README\\.md$",
+    "^test/",
+    "^lib/pll/(error|segment|rate|pacer|span)\\.ex$",
+    "^mix\\.exs$",
+    "^\\.formatter\\.exs$",
+    "^\\.gitignore$",
+    "^LICENSE$"
+  ],
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Rate: exact factories, formatting and input envelopes",
+      "test": "mix test test/pll/rate_test.exs --seed 0",
+      "expect": [
+        "^Result: 9 passed$"
+      ],
+      "tier": "normal"
+    },
+    {
+      "id": "T2",
+      "title": "Pacer and Span: untrimmed issuance, bounds, lazy snapshots and README examples",
+      "test": "mix test test/pll/pacer_test.exs test/pll/span_test.exs test/pll/readme_test.exs --seed 0",
+      "expect": [
+        "^Result: 21 passed$"
+      ],
+      "tier": "normal"
+    },
+    {
+      "id": "T3",
+      "title": "Trim transitions and independent rational differential model",
+      "test": "mix test test/pll/trim_test.exs test/pll/model_test.exs --seed 0",
+      "expect": [
+        "^Result: 8 passed$"
+      ],
+      "tier": "normal"
+    },
+    {
+      "id": "T4",
+      "title": "Whole stage: formatting, warnings and every test green",
+      "test": "mix format --check-formatted && MIX_ENV=test mix compile --warnings-as-errors && mix test --seed 0",
+      "expect": [
+        "^Result: 38 passed$"
+      ],
+      "tier": "normal"
+    }
+  ]
+}
