@@ -1,3 +1,50 @@
+# Benchmark supporting contract — current overlay
+
+Subordinate to README.md sections Throughput benchmark and Benchmark kit operation.
+Those sections define approved scope, bounded options, nine workloads, metrics,
+effects and review gate. New promises/dependencies/library changes block work.
+Historical Stage 3 contract follows for provenance; its writable-source and task
+instructions are superseded by this overlay, not its library behavior.
+
+Only scripts/bench/runner.exs may be implemented; no new implementation files.
+Preserve supplied exported signatures/comments. Complete protected contract.exs
+provides config parsing and metric arithmetic; complete throughput.exs parses then
+dispatches. Runner.prepare/2 constructs public API states outside timing;
+execute/3 chains transitions, returning calls, units, checksum, statuses, state;
+validate!/3 raises on count/status mismatch; sample/4 accepts clock and snapshot
+functions for deterministic tests; main/1 uses real tool-only measurements and
+prints bounded sequential samples. No other effects, environment, private library
+state access, subprocesses or dependencies. Use only PLL public APIs.
+
+Snapshot map keys memory_bytes (self process), gc_count/reclaimed_words (VM-wide).
+Reports omit state but retain checksum/statuses and include elapsed_ns,
+process_memory_delta_bytes, vm_gc_count_delta, vm_reclaimed_words_delta plus
+Contract.metrics/3 fields. Snapshot before, clock before, execute, clock after,
+snapshot after, then validation/report/output. Setup/warmup not timed. Keep final
+state through clock end. GC values are VM-wide and memory is a signed net delta,
+not allocation/peak claims. main header fields and exact workload inputs are in
+README. library_revision is pinned baseline metadata, not checkout auto-detection.
+
+## Current promise mapping and checks
+
+Preserve T1/T2/T3/S2-config/S2-mapping/S3-history: 9/21/8/4/4/20 tests (66 total).
+Replace old S3-tree with final BENCH-tree, preserving historical .loop state.
+BENCH-1 (normal): test/bench/runner_test.exs, 6 tests: option bounds/errors,
+metric arithmetic, all nine real chained public workloads and independent status
+counts, checksum enumeration, fake timing/introspection report deltas, finite
+real timed smoke with 18 observed rows. BENCH-tree: formatting including scripts,
+warnings-as-errors, all 72 tests and public CLI smoke. Both must fail stubs.
+No wallclock thresholds. Input errors exit 2 via protected entrypoint, no workload.
+All library/tests/fixtures/supporting docs/config/complete seams protected.
+Local freedom: helper functions in runner.exs only. No extra files or refactoring.
+
+No coder/model loop before parent review. Original $25 unchanged; caps reported,
+not independently verified, spend unknown. No installs/remotes/publication.
+Broader benchmarks, adapters/products, runtime matrix and aggregate spending
+accounting remain deferred until their affected stage is explicitly approved.
+
+---
+
 # Stage 3 supporting contract — complete follower overlay
 
 Subordinate to root README.md: Public API; Types/bounds/errors; Exact pacer;

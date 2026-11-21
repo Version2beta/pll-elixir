@@ -1,6 +1,6 @@
 {
-  "format": "mix format",
-  "format_check": "mix format --check-formatted",
+  "format": "mix format && mix format scripts/bench/*.exs scripts/throughput.exs",
+  "format_check": "mix format --check-formatted && mix format --check-formatted scripts/bench/*.exs scripts/throughput.exs",
   "check": "MIX_ENV=test mix compile --warnings-as-errors",
   "protected": [
     "(^|/)README\\.md$",
@@ -14,7 +14,10 @@
     "^lib/pll/(follower|follower_config|observation|status|state|rate_core|pacer_core|span_core|segment_core)\\.ex$",
     "^docs/",
     "^scripts/corpus/",
-    "^lib/pll/follower_core\\.ex$"
+    "^lib/pll/follower_core\\.ex$",
+    "^lib/",
+    "^scripts/bench/contract\\.exs$",
+    "^scripts/throughput\\.exs$"
   ],
   "tasks": [
     {
@@ -72,11 +75,21 @@
       "tier": "normal"
     },
     {
-      "id": "S3-tree",
-      "title": "Final stage whole tree: format, compile and every regression",
-      "test": "mix format --check-formatted && MIX_ENV=test mix compile --warnings-as-errors && mix test --seed 0",
+      "id": "BENCH-1",
+      "title": "Public API throughput harness and validated report sinks",
+      "test": "mix test test/bench/runner_test.exs --seed 0",
       "expect": [
-        "^Result: 66 passed$"
+        "^Result: 6 passed$"
+      ],
+      "tier": "normal"
+    },
+    {
+      "id": "BENCH-tree",
+      "title": "Final whole-tree and public benchmark smoke",
+      "test": "mix format --check-formatted && mix format --check-formatted scripts/bench/*.exs scripts/throughput.exs && MIX_ENV=test mix compile --warnings-as-errors && mix test --seed 0 && mix run scripts/throughput.exs --smoke",
+      "expect": [
+        "^Result: 72 passed$",
+        "^.*workload: :step.*$"
       ],
       "tier": "normal"
     }

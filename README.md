@@ -31,8 +31,9 @@ They work separately or together: follower trim can steer a pacer.
 | Approved | Stage 3 overlay kit preparation and verified complete kit commit only, followed by parent review before any coding loop. Complete windows/outliers/steps, edge/retry cases, deterministic synthetic integration, public-Go differential corpus and all examples/regressions. Prior runner commit/discard permissions remain scoped to passing attempts/attempt-owned failures. No preparation model calls, installs, remotes, publication or later kits. Original $25 total is not expanded; caps remain owner-confirmed, not independently verified, spend unknown. |
 | Approved | Dependency-free line-oriented corpus with decimal integers and hex binary64; separately authorized temporary offline generator against the pinned public Go API, leaving ../pll untouched. No network or dependency fetches. |
 | Approved | Stage 3 parent review passed for the verified kit and the 159-record public-Go corpus. This records no normative API or test change. One Stage 3 implementation run is authorized with the exact command in the Stage 3 kit operation section: claude-haiku-5-5 for normal attempts, gpt-6.1-sol high for the second attempt and gpt-6.1-sol max for the final attempt, using MAX_ITER=12, MAX_ATTEMPTS=3, ITER_SECONDS=1200 and JUDGE_TIMEOUT=300. Prior runner commit and discard permissions apply only to passing attempts and attempt-owned failures. The original $25 total is not expanded; provider caps are owner-confirmed, not independently verified, and spend is unknown. No later kits, installs, remotes or publication are authorized. |
+| Approved | Bounded dependency-free public-API throughput harness kit and verified kit commit; tool-only clock/introspection/output effects as described below. Parent review before coding loop; no expanded budget, library changes or dependencies. |
 | Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
-| Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and benchmarks; decide before the affected stage. No task may assume them. |
+| Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and broader benchmarks; decide before the affected stage. No task may assume them. |
 
 **Current gate: author review of the completed Stage 3 implementation (run completed once; no further loop authorized).**
 See [Stage 3 verification](docs/stage3-verification.md) and operation commands at
@@ -869,3 +870,136 @@ Original total $25 unchanged; caps owner-confirmed, not independently verified;
 spend/remaining unknown. Attempt/time limits do not enforce dollars. No preparation
 model calls, remotes, installs, publication or later kits. Runtime matrix/release
 and adapters remain deferred until separately reviewed.
+
+## Throughput benchmark (approved bounded tool; implementation pending review)
+
+This dependency-free developer harness measures this Elixir implementation, not
+Go speed or real-time scheduling. It is separate from the pure runtime library.
+The approved outcome is a local harness only: no library API/algorithm changes,
+installs, dependencies, network, secrets, global VM tuning or concurrency product.
+CLI spelling, bounded defaults and report definitions below are local design
+choices within that approval. Wider benchmarking/publication remains deferred.
+
+Promised commands after BENCH-1 implementation (not results from delivered stubs):
+
+```sh
+mix run scripts/throughput.exs --smoke
+mix run scripts/throughput.exs
+mix run scripts/throughput.exs --iterations 1000 --samples 3 --warmup 100
+```
+
+No environment configuration, config files, workload selection or positional
+arguments. `--smoke` must stand alone: 12 iterations, 2 samples, 4 warmup iterations
+per workload. Otherwise defaults are 1000 iterations, 3 samples, 100 warmup.
+Each integer must be canonical positive decimal; iterations/warmup <=10000,
+samples <=10; unknown, duplicate, missing, malformed or oversized options fail
+with stderr and exit 2 before workloads. At most 900000 measured logical ops plus
+90000 warmup ops across all nine workloads; each op is bounded (span visits 64
+items). These bound work, not elapsed wallclock on arbitrary hardware.
+
+Each workload warms up once, then prepares a fresh independent state outside each
+sample's timer, and **chains every next immutable state within that sample**.
+Workloads/samples run sequentially, no sleeping or live observation timestamps.
+All library input clocks are deterministic integer counters. No library source,
+API, algorithm, private fields or external implementation may be used/changed.
+
+| Workload | One logical op; units per op |
+| --- | --- |
+| due_one | Pacer.due at i-1 ns, cap 1; 1 issued slot |
+| due_batch | Pacer.due at 64*i-1 ns, cap 64; 64 issued slots |
+| claim | Pacer.claim(1500); 1500 issued slots |
+| skip | Pacer.skip at 64*i-1 ns, keep 0, plus next_due sink query; 64 skipped slots |
+| span | Fully reduce Span.all over a preissued 64-slot span into sum(slot+ns); 64 generated tuples |
+| inlier | Follower.observe at (10*i,10*i); 1 reading, accepted |
+| window | observe(i,i), window_ns=4; 1 reading; accepted floor((n-1)/4), remaining pending |
+| outlier | observe(10*i,10*i+100), threshold 10, step_after=n+1; 1 reading, rejected |
+| step | observe(10*i,10*i+100*ceil(i/3)), threshold 10, step_after=3; 1 reading; floor(n/3) stepped, remaining rejected |
+
+All rates are 10^9 units/s (1 ns period), zero pacer trim. Followers use default
+config except those listed (all follower thresholds here are 10 ns); each sample
+anchors at (0,0) outside timing. Warmup uses its own n for outlier step_after.
+Issuance does not enumerate spans: checksum adds first+count. Skip checksum adds
+next cursor+due time. Follower checksum adds observation error+input local+remote;
+status counts are observed, not assumed. Validate actual calls, units and exact
+status distributions after timing; mismatch raises rather than mislabels a row.
+Span enumeration is intentionally separate from issuance and repeatedly consumes
+the same immutable span, generating every tuple anew. Other workloads must not
+repeatedly use initial states. Checksums/counts are emitted, never dead sinks.
+
+Header labels: schema name `pll-throughput-v1`, Elixir/OTP, system architecture,
+online schedulers, config and **library_revision**, pinned to the protected
+Stage 3 baseline `03a99baca1db2872f6e6f9298914aab9e2242a2a`. This identifies
+library code, NOT the benchmark implementation's checkout SHA/dirty status; record
+`git rev-parse HEAD` separately when comparing local runs. No environment dump.
+One stdout map per sample includes workload/sample, calls, units, statuses,
+checksum and the following non-aggregated metrics:
+
+* elapsed_ns: monotonic nanoseconds around execute only, including loop, state
+  threading, accounting and sink overhead; not a pure isolated API latency.
+* ns_per_op = elapsed_ns/calls; ops_per_s = calls*10^9/elapsed_ns.
+* units_per_s = units*10^9/elapsed_ns. Slots/tuples/readings differ as above:
+  do not confuse batch unit throughput with call throughput.
+* process_memory_delta_bytes: self process memory after minus before sample,
+  signed bytes (may be negative). Not peak memory or allocation volume.
+* vm_gc_count_delta and vm_reclaimed_words_delta: differences of BEAM VM-wide
+  `:erlang.statistics(:garbage_collection)` counters, including unrelated work;
+  reclaimed **words**, not bytes/allocations or per-op allocations. Introspection
+  brackets the timer and includes some measurement/validation bookkeeping (but
+  validation itself occurs after the second snapshot). No forced GC.
+
+Nonpositive measured elapsed time fails rather than divides by zero. Output,
+metadata, warmup and setup are outside timing. Retained state lives through the
+second clock; a report keeps scalar sinks/counts, not a permanent state history.
+No thresholds, automatic tuning, Go comparison claims or statistical confidence
+claims; short smoke times are only finite execution evidence. Repeat samples and
+inspect noise before drawing conclusions.
+
+Tool-only effects are explicitly permitted: monotonic clock reads, process memory
+and VM-wide GC introspection, runtime/platform queries and stdout/stderr. Mix may
+write ignored build caches/start VM processes as usual. The harness itself does
+not write results, spawn workload processes, read environment/secrets, contact
+network, sleep or tune VM globals. No permanent results/artifact format is added.
+
+### Benchmark kit operation — parent review gate, do not launch yet
+
+Prepared directly on `kit/throughput-benchmark` over actual clean Stage 3 HEAD
+`03a99baca1db2872f6e6f9298914aab9e2242a2a`; no archive to apply. Existing `.loop/`
+state remains intact. BENCH-1 is the single normal implementation task; BENCH-tree
+replaces S3-tree and stays last. Only `scripts/bench/runner.exs` is writable
+implementation, plus progress notes. All library sources, tests, fixtures,
+READMEs, supporting contracts, config and complete parser/entrypoint are protected.
+No private reference is included or available to the coder.
+
+Prerequisites unchanged: installed Bash/Git/jq/timeout (or gtimeout), Elixir/Mix/OTP;
+pi only for a separately reviewed launch. No installs/fetches. Check locally:
+
+```sh
+git status --short
+mix format --check-formatted
+mix format --check-formatted scripts/bench/*.exs scripts/throughput.exs
+MIX_ENV=test mix compile --warnings-as-errors
+mix test test/pll --seed 0  # all 66 prior tests, including Stage 3 corpus
+mix test --seed 0         # stubs intentionally fail new tests
+bash scripts/loop.sh --check
+```
+
+`--check` makes no model calls. Verified evidence and protection inventory:
+[benchmark kit verification](docs/benchmark-verification.md). Kit-only commit is
+authorized; **stop for parent review before any implementation loop**. The eventual
+command remains unchanged, shown for review only, NOT a launch instruction now:
+
+```sh
+MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \
+CHEAP_CMD='pi --provider anthropic --model claude-haiku-5-5 --thinking high --print --no-session' \
+STRONG_CMD='pi --provider openai-codex --model gpt-6.1-sol --thinking high --print --no-session' \
+STRONGEST_CMD='pi --provider openai-codex --model gpt-6.1-sol --thinking max --print --no-session' \
+bash scripts/loop.sh
+```
+
+Runner commits passing attempts on the nonmain branch and discards only
+attempt-owned failures; prompts/logs/diffs/notes under `.loop/`, exhausted task
+in root `STOP`. Never reset historical attempts. Haiku normal, GPT high/max
+escalation; no substitutions, extra calls or fanout. Original aggregate $25
+budget is not expanded; provider caps owner-confirmed, not independently verified;
+spend/remaining unknown. Attempt/time limits do not enforce dollars. Contract gaps
+block the run for review; progress notes do not stop retries automatically.

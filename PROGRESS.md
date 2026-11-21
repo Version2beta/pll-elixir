@@ -144,3 +144,19 @@ warnings-as-errors compile passed, `mix test --seed 0` 66 passed, `scripts/loop.
 passed all seven tasks. Completed observe never emits :unsupported. Evidence is finite
 fixtures and frozen-gain models, not universal parity, live integration, security or
 performance. Total spend unknown; one coder call. No further loop is authorized.
+
+# Benchmark overlay kit — parent review before coding loop
+Owner Proceed approved bounded dependency-free throughput tool outcome and verified
+kit commit only at this checkpoint. Baseline actual clean Stage 3 HEAD 03a99baca1db2872f6e6f9298914aab9e2242a2a;
+new branch kit/throughput-benchmark. Public API-only nine workloads; complete bounded
+parser/report arithmetic and CLI, one implementation stub and six protected tests.
+All 66 prior checks pass delivered stubs; whole tree 68/72 (4 expected failures),
+BENCH-1 and BENCH-tree both fail unchanged --check. External private reference over
+actual Stage 3 passes all 72 tests and eight runner tasks. Public smoke: 18 observed
+samples, 0.28 s startup-inclusive local elapsed; statuses/sinks inspected. No speed
+claims. Detailed scopes/limits/protection evidence: docs/benchmark-verification.md.
+Runner byte-identical; mechanics 26 passes/26 mutations caught. .loop state kept.
+Only scripts/bench/runner.exs and progress notes are writable. All library sources,
+tests, config, READMEs/docs, complete parser/entrypoint protected. No real loop/model
+calls, installs, remotes/publication or sibling changes. Original $25 total unchanged,
+caps reported not independently verified, spend unknown. Stop for parent review.
