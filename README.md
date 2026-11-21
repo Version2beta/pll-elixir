@@ -1,12 +1,12 @@
 # pll-elixir — exact pacing and clock following
 
-> **Approved design / Stage 1 kit.** The exact-pacing kit supplies protected
-> seams, tests and intentionally failing implementation stubs. Independent source
-> review found no code or test blockers. Stage 1 implementation is governed by the
-> launch gate below; its completion is established only by the runner's result.
-> APIs/examples remain finished-tool promises, not a published port. Only a
-> private reference is used for kit feasibility checks. Follower work remains
-> future scope.
+> **Approved design; Stage 1 exact pacing implemented on `kit/stage1-exact-pacing`.**
+> The kit was prepared with protected seams, tests and intentionally failing stubs.
+> The owner-authorized unchanged runner then committed passing implementations for
+> T1–T3, and T4 passes the whole stage. APIs/examples remain finished-tool promises,
+> not a published port. A private reference was used only for kit feasibility checks.
+> Follower work remains future scope. **Current gate: author review, not another
+> implementation loop.**
 
 This library helps audio/video, sensor, packet and device-buffer applications
 pace units on their own timeline or learn the relationship to another clock.
@@ -20,7 +20,7 @@ They work separately or together: follower trim can steer a pacer.
 | Status | Decision and rationale |
 | --- | --- |
 | Approved | The user requested Elixir and Python versions of the same Go library, sibling directories `../pll-elixir` and `../pll-python`, and comprehensive README-first docs before readme-loop implementation stages. |
-| Superseded | The earlier README-only assignment prohibited kits/Git/implementation. The approvals below now authorize bounded Stage 1 kit preparation, not an immediate implementation launch. |
+| Superseded | The earlier README-only assignment prohibited kits/Git/implementation. The approvals below now authorize bounded Stage 1 kit preparation and one owner-authorized Stage 1 implementation run, which has completed. |
 | Approved | Local Mix package name `pll`, namespace `PLL`, Elixir >=1.15 with Erlang/OTP >=26; builtins/standard library only, ExUnit tests. Broader runtime testing and Hex publication availability are not established. |
 | Approved | Validate all scalar argument types/envelopes left-to-right before semantic checks: Rate.units_per_second(0,U+1) and due(p,-1,U+1) return overflow. This resolves mixed-invalid-input precedence. |
 | Approved | Existing README design: the API, integer envelopes, tagged errors, immutable explicit state transitions, numerical compatibility and library-only scope below. First bounded stage: exact Rate/Pacer/Span; follower contracts are preserved for later kits. |
@@ -31,13 +31,16 @@ They work separately or together: follower trim can steer a pacer.
 | Deferred | Aggregate spend accounting, remaining-budget tracking and runner-side dollar enforcement. Not established; any later paid run needs a new decision on these. |
 | Deferred | Hex publication, broader runtime matrix, release automation, OTP adapters, CLI, simulator product and benchmarks; decide before the affected stage. No task may assume them. |
 
-**Current gate:** the Stage 1 exact-pacing implementation loop is authorized for
-one run through the unchanged runner, under the launch settings below. Independent
-source review of the kit found no code or test blockers. Stop and return for
-author review at Stage 1 completion or any contract blocker. No follower
-implementation, installation, remote or publication action, or later kit is part
-of this gate. The approved finished-tool design is not evidence that its stubs
-implement it.
+**Current gate: author review.** The Stage 1 exact-pacing implementation loop ran
+once through the unchanged runner, as authorized, and all four tasks pass. Three
+first-attempt coder commits used `claude-haiku-5-5` (T1 `792e3f8`, T2 `7b4603e`,
+T3 `d999aac`). No `gpt-6.1-sol` escalation or `STOP` occurred. Total spend is
+unknown; the owner-confirmed provider-side cap is not independently verified or
+runner-enforced. Return to the author before any next kit. This gate does not
+authorize another implementation loop, model call, follower work, installation,
+remote, publication or later kit. The approved finished-tool design is not itself
+evidence of implementation; the Stage 1 evidence below covers exact Rate/Pacer/Span
+only.
 
 **Local implementation freedom:** private helpers, integer
 algorithms and immutable segment sharing within the kit's complete types/seams,
@@ -77,7 +80,7 @@ needed to use the core. Caller-owned OTP integration is an adapter concern.
 
 Recommended baseline: Elixir >=1.15 and Erlang/OTP >=26, binary64 floating
 arithmetic and arbitrary-precision integers. The broader supported runtime
-matrix still needs testing; this kit is checked on Elixir 1.20.4 / OTP 29 only.
+matrix still needs testing; Stage 1 is checked on Elixir 1.20.4 / OTP 29 only.
 No third-party runtime or test dependency,
 credentials, environment configuration or project/user configuration files.
 All settings are explicit function arguments; there is no precedence system.
@@ -85,18 +88,18 @@ All settings are explicit function arguments; there is no precedence system.
 After implementation, a **proposed local consumer dependency** is:
 
 ```elixir
-# Future consumer mix.exs entry, usable after implementing the supplied stubs:
+# Proposed consumer mix.exs entry for this Stage 1 checkout:
 {:pll, path: "../pll-elixir"}
 ```
 
 From the future consumer project, `mix deps.compile pll` would compile that
-local dependency; from this library root, `mix compile` builds the kit seams
-and stubs, not a working pacing implementation. No installs or fetches are
+local dependency; from this library root, `mix compile` builds the Stage 1 exact
+pacing modules. Follower modules do not exist yet. No installs or fetches are
 authorized. No Hex version/install command is promised; publication availability
 has not been checked. Compiling can write build
 artifacts, but the library runtime has no file effects.
 
-## First useful example (promised; private-reference evidence only)
+## First useful example (promised; Stage 1 README example tests)
 
 All times are **integer nanoseconds**, never floating seconds or implicit clocks.
 Every state transition returns a new value; callers must retain it.
@@ -526,8 +529,8 @@ The deterministic checks require no network or credentials.
 Use ExUnit and builtin arithmetic; no added testing dependency. Stage 1
 source-named suites cover Rate, Pacer, Span, an independent rational oracle and
 pacing README examples. FollowerConfig/Follower and shared differential fixtures
-remain future checks. Commands from this project root (tests intentionally fail
-unimplemented stubs):
+remain future checks. Commands from this project root (Stage 1 suites pass on
+this checkout):
 
 ```sh
 mix format --check-formatted
@@ -592,7 +595,8 @@ are approved limits, not results measured on a completed port.
 Prepare **one bounded kit at a time**: protect the
 approved README, use subordinate supporting spec/promise-to-test mapping,
 non-vacuously failing stubs, private passing reference, runner-judge and full
-stage checks. Return for review between kits. Stage 1 alone is authorized now.
+stage checks. Return for review between kits. Stage 1 is implemented on this
+branch; the next gate is author review, not another loop.
 
 1. **Exact pacing:** Rate/Pacer/Span, error/input envelopes, immutable chaining,
    all pacing examples, independent rational oracle and extreme boundaries.
@@ -608,33 +612,46 @@ stage checks. Return for review between kits. Stage 1 alone is authorized now.
    remain separate decisions.
 
 **Evidence scope:** documentation is grounded in pinned Go source/tests. Stage 1
-supplies a Mix project and failing stubs, protected public seams, acceptance
-tests and a subordinate [SPEC.md](SPEC.md). Private-reference checks establish
-local feasibility only, not a coder implementation. There is no completed port,
+supplies a Mix project, protected public seams, the Stage 1 exact-pacing
+implementation, acceptance tests and a subordinate [SPEC.md](SPEC.md). Private-reference
+checks during kit preparation established feasibility only. The Stage 1 code was
+written by the runner's coder and judged by the unchanged runner and Mix commands;
+that is not owner, live-model or integration acceptance. There is no completed port,
 installed/published package, follower verification, Go differential corpus,
 performance result, live-model trial or real-device validation. Source Go
-results are not port evidence. Review the preparation evidence and the Stage 1
-run result before any later kit.
+results are not port evidence. Author review of the Stage 1 result is the current
+gate before any later kit.
 
-**Local kit evidence (Elixir 1.20.4 / OTP 29):** unchanged runner `--check`
-passes all four tasks on the private reference: 9, 21, 8 and 38 tests respectively,
-with zero failures/skips/exclusions. The final 38-test stage also passes directly.
-Both pacing example fences execute against the reference. On supplied stubs,
-all four runner tasks fail; the whole suite has 37 failures out of 38 tests.
-Task independence was also checked with reference Rate plus Pacer/Span stubs,
-and an otherwise working reference with set_trim stubbed. Inherited disposable
-runner regressions: all 26 cases pass and all 26 deliberately regressed copies
-are caught, with no model calls. These are fixture/reference results only;
-the delivered checkout intentionally contains the failing stubs.
+**Kit-preparation evidence (historical, before the run; Elixir 1.20.4 / OTP 29):**
+unchanged runner `--check` passed all four tasks on the private reference: 9, 21,
+8 and 38 tests respectively, with zero failures/skips/exclusions. Both pacing
+example fences executed against the reference. On the supplied stubs all four
+runner tasks failed; the whole suite had 37 failures out of 38 tests. Task
+independence was also checked with reference Rate plus Pacer/Span stubs, and an
+otherwise working reference with set_trim stubbed. Inherited disposable runner
+regressions: all 26 cases pass and all 26 deliberately regressed copies are
+caught, with no model calls. These are fixture/reference results only.
+
+**Owner-checkout implementation evidence (current):** the runner's coder made three
+first-attempt commits with `claude-haiku-5-5`: T1 `792e3f8`, T2 `7b4603e`, T3
+`d999aac`. No `gpt-6.1-sol` escalation or `STOP` occurred. T4, the whole stage,
+passed the runner's judge without a coder attempt. At implementation commit
+`d999aac`: `mix format --check-formatted` passed; `MIX_ENV=test mix compile
+--warnings-as-errors` passed; `mix test --seed 0` reported 38 passed; and
+`bash scripts/loop.sh --check` passed T1–T4. This verifies only the Stage 1 suite
+and judge commands on this machine and toolchain. It is not owner acceptance,
+live-model, integration or real-use validation. Total model spend is unknown.
 
 ## Stage 1 kit operation (development only, not library API)
 
 The kit is prepared directly in this checkout on `kit/stage1-exact-pacing`;
 there is no archive to apply and no earlier implementation stage to overlay.
-Do not copy the private reference into a coder checkout. The kit commit contains
+Do not copy the private reference into a coder checkout. The kit commit contained
 stubs intentionally, not the reference. Existing README work and transient
 `.wtha/` metadata are preserved; `.wtha/`, `_build/`, `.loop/` are excluded from
 Git. No source files may be hidden to satisfy the runner's clean-start gate.
+The kit commit `69ea26e` contained stubs intentionally; the current Stage 1
+implementation is in the runner's commits after `c4f8a7e`.
 
 Prerequisites: Bash, Git, jq, a working `timeout` or `gtimeout`, Elixir/Mix/OTP,
 and installed `pi` for the authorized paid run. Local preparation checked Bash 3.2,
@@ -642,26 +659,27 @@ Git 2.54, jq 1.7, timeout smoke behavior, Elixir 1.20.4 / OTP 29 and pi 1.5.2.
 No dependency install/fetch is needed. Tests use no live clocks, network or
 credentials. Commands below write ignored development artifacts, not runtime I/O.
 
-Review/apply checks from the kit checkout:
+Review checks from this checkout:
 
 ```sh
 git branch --show-current
 git status --short
 mix format --check-formatted
 MIX_ENV=test mix compile --warnings-as-errors
+mix test --seed 0
 bash scripts/loop.sh --check
 ```
 
-`--check` launches no coder or formatter. On supplied stubs all four tasks must
-fail (exit 1); on the private reference all four must pass (exit 0), including
-whole-stage tests. Task stdout uses the exact installed ExUnit summary format;
-a different runtime requires kit re-verification, not loose pass markers.
+`--check` launches no coder or formatter. On this checkout all four tasks pass
+(exit 0), including whole-stage tests. The kit-preparation stubs failed all four
+tasks (exit 1) before the run. Task stdout uses the exact installed ExUnit summary
+format; a different runtime requires kit re-verification, not loose pass markers.
 There are no prior-stage checks. See SPEC for promise-to-test mapping.
 
-**Authorized Stage 1 launch.** Independent source review found no code or test
-blockers. The owner authorized this bounded run with a $25 total budget and
-confirmed a provider-side cap is configured. Run exactly this command from the
-kit checkout:
+**Stage 1 implementation run (completed once; not authorized again).** Independent
+source review found no code or test blockers. The owner authorized this bounded run
+with a $25 total budget and confirmed a provider-side cap is configured. The run used
+exactly this command from the kit checkout:
 
 ```sh
 MAX_ITER=12 MAX_ATTEMPTS=3 ITER_SECONDS=1200 JUDGE_TIMEOUT=300 \
@@ -690,4 +708,6 @@ provider-side spending cap configured; this is not independently verified. Pi's
 local usage estimates are not a verified aggregate/provider billing ledger. Exact
 `--print --no-session` commands do not persist session usage, and the runner does
 not aggregate costs or enforce a dollar cap. No model/coder subprocess is invoked
-by kit preparation or `--check`.
+by kit preparation or `--check`. The completed run made three coder calls, all
+`claude-haiku-5-5` first attempts. Its total spend is unknown from this checkout and
+must be checked against the provider's usage record.

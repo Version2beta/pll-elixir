@@ -18,8 +18,8 @@ Pacer carries nominal Rate, cursor, segment; Span carries first/count/segment.
 Representation is not a serialization promise. Only factory/transition-issued
 values (plus zero Rate/Span sentinels) need support; manually forged states
 are unsupported. Wrong struct kinds raise ArgumentError, not FunctionClauseError.
-All exported names/signatures/docs are fixed. Implementation lives in supplied
-*_core.ex stubs and, if useful, new private helper modules. Public wrappers,
+All exported names/signatures/docs are fixed. Implementation lives in the supplied
+*_core.ex seams and, if useful, new private helper modules. Public wrappers,
 getters, String.Chars dispatch and error messages are complete, not coder work.
 PLL.Error.message covers the three Stage 1 codes; future follower codes remain
 outside this stage. The development version 0.0.0-dev is not a release promise.
@@ -62,17 +62,18 @@ an allocation or universal computational-complexity proof.
 T1 implements RateCore. T2 implements untrimmed PacerCore/SpanCore, including
 validation of invalid trims; T3 adds valid trim transitions and whole-state
 rational comparisons. T4 is integration, not a padded independent feature.
-Earlier tests must continue passing. All meaningful tasks and the whole-tree
-check must fail supplied stubs and pass the private reference using unchanged
-scripts/loop.sh --check. Exact stdout summaries are pinned to installed ExUnit
-1.20.4; on another ExUnit summary version stop for kit re-verification rather
+Earlier tests must continue passing. During kit preparation, all meaningful tasks
+and the whole-tree check were verified to fail supplied stubs and pass the private
+reference using unchanged scripts/loop.sh --check. On the owner checkout the runner
+then committed passing T1–T3 implementations, and T4 passes the whole stage.
+Exact stdout summaries are pinned to installed ExUnit 1.20.4; on another ExUnit summary version stop for kit re-verification rather
 than weakening expectations. No test is skipped/excluded.
 
 Protected inventory: root README.md (and any nested approved README), SPEC.md,
 PROMPT.md, tasks.json, scripts/loop.sh, .gitignore, .formatter.exs, mix.exs,
 LICENSE, any config/ directory, every test/support file, and complete
-lib/pll/{error,segment,rate,pacer,span}.ex. PROGRESS.md and core stubs are intentionally writable. No private
-reference belongs in this repository. .loop/, _build/ and existing transient
+lib/pll/{error,segment,rate,pacer,span}.ex. PROGRESS.md and the *_core.ex files are
+intentionally writable. No private reference belongs in this repository. .loop/, _build/ and existing transient
 .wtha/ metadata are ignored; none are runtime library outputs.
 
 Private helpers, exact arithmetic algorithms and period reduction are local
@@ -81,19 +82,21 @@ Future follower/config/status/mapping tests, shared Go corpus/encoding, wider
 runtime matrix, release automation, publication and OTP adapters are deferred
 until their affected reviewed kit. No task may assume those decisions.
 
-## Evidence limits and launch gate
+## Evidence limits and gate
 
 Reference checks establish satisfiability by one local implementation, not
 owner/coder implementation correctness, security, live models, integration,
 performance, a supported runtime matrix or actual device use. Runtime effects
 are also reviewed in the private reference; development tooling itself writes
-_build/. The final checkout intentionally returns to failing stubs.
+_build/. The kit-preparation checkout returned to failing stubs; the current
+checkout contains the runner-committed Stage 1 implementation.
 
-The Stage 1 implementation loop may run only under the owner's authorization in
-the README launch gate: Haiku-5.5 normal attempts with gpt-6.1-sol escalation and
-a $25 total budget. Independent source review of this kit found no code or test
-blockers. The owner reports a provider-side spending cap configured; this is not
-independently verified. The unchanged runner has attempt/time limits but no
-dollar cap and does not aggregate spending. Notes cannot automatically pause it
-for contract changes; a contract blocker must stop the run through the harness
-and return for review.
+The Stage 1 implementation run has completed once under the README launch gate:
+three first-attempt claude-haiku-5-5 commits (T1, T2, T3) and a passing whole-stage
+T4. No gpt-6.1-sol escalation or STOP occurred. The owner reports a provider-side
+spending cap configured; this is not independently verified. The unchanged runner
+has attempt/time limits but no dollar cap and does not aggregate spending, so total
+spend is unknown. Notes cannot automatically pause it for contract changes; a
+contract blocker must stop the run through the harness and return for review.
+Current gate: author review. No further implementation loop is authorized by this
+document.

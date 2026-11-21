@@ -1,9 +1,15 @@
 # Stage 1 progress
 
-Kit preparation verified protected seams/tests against an external private
-reference using unchanged runner --check: T1 9, T2 21, T3 8, T4 38 passing tests.
+Current state (author review gate): the owner-authorized Stage 1 runner completed on
+kit/stage1-exact-pacing. T1 (792e3f8), T2 (7b4603e) and T3 (d999aac) each passed on
+the first claude-haiku-5-5 attempt; T4 (whole stage) passed the runner judge with 38
+tests. No gpt-6.1-sol escalation and no STOP. Total spend unknown; the owner-reported
+provider cap is not independently verified. No further loop is authorized.
+
+Kit preparation (historical, before the run) verified protected seams/tests against an
+external private reference using unchanged runner --check: T1 9, T2 21, T3 8, T4 38 passing tests.
 Both pacing README fences passed on that reference. Every task fails delivered
-stubs; whole-stage stubs: 1/38 passed, 37 failures. No coder attempts have run.
+stubs; whole-stage stubs: 1/38 passed, 37 failures. No coder attempts had run then.
 
 Owner clarified: validate all scalar types/envelopes left-to-right, then semantics.
 Independent source review found no code/test blockers. The owner authorized the
