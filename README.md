@@ -1,10 +1,15 @@
-# pll-elixir — exact pacing and clock following
+# pll-elixir
 
+<!-- site:skip -->
 > **Stage 3 implementation completed by the single authorized runner run (exit 0); author review gate.** Completed observe never emits `:unsupported`. Evidence is finite fixtures only: not universal parity, live integration, security or performance.
 > Stage 1, Stage 2 and Stage 3 are implemented; the full normative follower contract below is unchanged.
 > Stage 2 run limitations/approvals below are historical, not current launch authority.
 > Benchmark: the single owner-authorized coding loop completed (exit 0) and the local harness is implemented; author review gate, no further loop authorized (see Throughput benchmark).
 > Pacing demonstration: the single authorized coder loop passed (`598a4a2`, attempt 1) and the bounded 18-trial local matrix completed with every trial passing its approved criteria; author review gate. No further loop, trial or model call is authorized (see [pacing verification](docs/pacing-verification.md#live-result-authorized-loop-and-bounded-matrix-complete-author-review-gate)).
+<!-- /site:skip -->
+
+The Rate, Pacer and complete Follower are implemented in this source checkout.
+Local Mix version: `0.0.0-dev`; no Hex publication is established.
 
 This library helps audio/video, sensor, packet and device-buffer applications
 pace units on their own timeline or learn the relationship to another clock.
@@ -13,6 +18,7 @@ A type-II, second-order phase-locked **Follower** estimates remote-clock phase
 and frequency, filters delivery jitter, and maps ticks to local nanoseconds.
 They work separately or together: follower trim can steer a pacer.
 
+<!-- site:skip -->
 ## Decisions and review gate
 
 | Status | Decision and rationale |
@@ -76,18 +82,15 @@ algorithms and immutable segment sharing within the kit's complete types/seams,
 provided results, bounds, laziness, ownership and effects stay as specified. No runtime dependencies may
 be added without owner approval. New contract gaps block affected kits and
 return for review, not silent implementation decisions.
+<!-- /site:skip -->
 
 ## Provenance, parity and non-goals
 
 Source: Go `github.com/version2beta/pll`, revision
-`971282632129110794c9d6edd22026e9de2359be` (short `9712826`), examined in
-`/Users/rob/Development/pll`. Basis: full `SPEC.md` and `README.md`, public
+[`971282632129110794c9d6edd22026e9de2359be`](https://github.com/version2beta/pll/tree/971282632129110794c9d6edd22026e9de2359be). Basis: full `SPEC.md` and `README.md`, public
 `rate.go`, `pacer.go`, `span.go`, `follower.go`, errors/status/package comments,
 and rate/pacer/follower examples, boundary and differential-model tests.
-The original is provenance, not a runtime dependency. This
-standalone root README is the port's user-facing readme-loop authority;
-supporting kit specs may clarify but cannot override it. Source/doc conflicts
-and later upstream changes require explicit review, not automatic adoption.
+The original is provenance, not a runtime dependency.
 
 Functional equivalence means exact pacer results and equivalent follower
 equations, state transitions, error categories and atomic failures on the shared
@@ -99,36 +102,31 @@ race-detector or simulator results, or real-time scheduler performance.
 
 This is a library, not a sleeping rate limiter, token bucket, scheduler,
 PTP/NTP/system-clock servo, counter-unwrapper, device driver, payload queue or
-transport. The Go `cmd/pllpace`, `cmd/pllsim`, UDP tests, full simulator and
-benchmark tools are excluded from initial port scope. Small deterministic
-synthetic-clock tests are in scope; a shipped simulator/CLI is deferred.
+transport. The checkout includes a throughput harness and a bounded local pacing
+demonstration, documented below. These are separate from the pure library;
+full Go command parity and a simulator product are not included.
 No GenServer, Agent, Task, supervision tree or application-start callback is
 needed to use the core. Caller-owned OTP integration is an adapter concern.
 
-## Prerequisites and future installation
+## Requirements and local installation
 
-Recommended baseline: Elixir >=1.15 and Erlang/OTP >=26, binary64 floating
-arithmetic and arbitrary-precision integers. The broader supported runtime
-matrix still needs testing; Stage 1 is checked on Elixir 1.20.4 / OTP 29 only.
-No third-party runtime or test dependency,
-credentials, environment configuration or project/user configuration files.
-All settings are explicit function arguments; there is no precedence system.
+Requires Elixir >=1.15 and Erlang/OTP >=26, binary64 floating arithmetic
+and arbitrary-precision integers. Historical local checks used Elixir 1.20.4 /
+OTP 29; the broader runtime matrix is not established. There are no third-party
+runtime or test dependencies. All settings are explicit function arguments.
 
-After implementation, a **proposed local consumer dependency** is:
+To use this source checkout from a consumer project's `mix.exs`:
 
 ```elixir
-# Proposed consumer mix.exs entry for this Stage 1 checkout:
 {:pll, path: "../pll-elixir"}
 ```
 
-From the future consumer project, `mix deps.compile pll` would compile that
-local dependency; from this library root, `mix compile` builds the Stage 1 exact
-pacing modules. Stage 2 config, mapping and inlier-loop seams are implemented; supplied Stage 3 history stubs still fail on unfinished windows/outliers/steps. No installs or fetches are
-authorized. No Hex version/install command is promised; publication availability
-has not been checked. Compiling can write build
-artifacts, but the library runtime has no file effects.
+Adjust the path for your project, then run `mix deps.compile pll` there.
+From this library root, `mix compile` builds the library. Compiling writes build
+artifacts; the library runtime has no file effects. This is a local development
+package, not a published Hex release.
 
-## First useful example (promised; Stage 1 README example tests)
+## First useful example
 
 All times are **integer nanoseconds**, never floating seconds or implicit clocks.
 Every state transition returns a new value; callers must retain it.
@@ -152,7 +150,7 @@ produces backlog, not silent loss. The caller chooses processing, caps or skips.
 Calling due again on p0 instead of p3 intentionally replays the original
 schedule: immutability does not enforce single consumption for the caller.
 
-## Public API (approved, exhaustive finished-library surface)
+## Public API
 
 `ns` below means integer nanoseconds, `ticks` a signed integer counter.
 Opaque states/values are structs, never PIDs. First/count and observation fields
@@ -210,7 +208,7 @@ arguments are integers in 0..U; valid rate terms and claim/cap counts are
 positive. Pacer time inputs first fit signed 64-bit ns, then must be
 nonnegative. Follower local/now inputs and remote ticks fit signed 64-bit and
 may be negative. Config durations fit signed 64-bit; step_after and lock_count
-also use signed 64-bit (the approved 64-bit Go baseline, not platform-dependent
+also use signed 64-bit (the 64-bit Go baseline, not platform-dependent
 Go int). Trim input fits signed 64-bit, then lies strictly between ±10^12.
 Integer intermediate arithmetic is unbounded and must not overflow or wrap.
 
@@ -251,7 +249,7 @@ then envelope, then semantic rule. Wrong types and semantic violations return
 returns `:overflow`. The three float fields require floats, not integers.
 Elixir normally cannot construct NaN/Infinity float terms; there is no string
 parser or nonfinite sentinel API. Nonfinite floating values, if supported by a
-future approved runtime boundary, must be rejected with the field's config
+supported runtime boundary, must be rejected with the field's config
 reason. Valid extreme finite inputs must still work without leaking arithmetic
 exceptions from overflowing intermediate gain products.
 
@@ -308,7 +306,7 @@ the pacer's lifetime. Treat it as read-only. Empty spans enumerate zero tuples
 and have no valid time index. Manually altered/forged structs have no timing
 guarantees. Issuing a span must not materialize its potentially enormous slots.
 
-### More hand-checkable pacing examples (promised)
+### More hand-checkable pacing examples
 
 ```elixir
 alias PLL.{Pacer, Rate, Span}
@@ -348,7 +346,7 @@ These must remain cheap span operations, not enumerate enormous lists.
 Start with `PLL.FollowerConfig.default(rate)`, then `%{cfg | window_ns: ...}`.
 The config is immutable; changing a separate config value cannot reconfigure
 an existing follower. Construct a new follower to change settings. Table order
-is validation order. Reasons are exact strings; approved port field spellings
+is validation order. Reasons are exact strings; port field spellings
 replace Go's CamelCase in errors.
 
 | Elixir field (Go field) | Type | Default | Invalid when / config reason |
@@ -368,7 +366,7 @@ Defaults target low-jitter readings. A suggested, never automatic, network
 profile from Go uses bandwidth 0.005 Hz, window 1_000_000_000 ns, lock threshold
 2_000_000 ns and outlier threshold 20_000_000 ns, other defaults unchanged.
 This trades settling speed for filtering; source simulator measured lock times
-and accuracy are not promises about this unimplemented port.
+and accuracy are not promises about this port.
 
 ## Follower state machine and numerical contract
 
@@ -492,7 +490,7 @@ promise. Rounding, integer anchoring and saturation rules still apply. At a
 0.5 ns period with anchor `(local=1,remote=0)`, local(-1) is
 `1+round_away(-0.5)=0`; with anchor `(-1,0)`, local(1) is 0.
 
-### Cross-module success and failure (promised)
+### Cross-module success and failure
 
 ```elixir
 alias PLL.{Error, Follower, FollowerConfig, Pacer, Rate, Span}
@@ -556,6 +554,25 @@ processes and write `_build`/compiler caches; format can write sources. Such
 explicit development-tool effects do not contradict the runtime contract.
 The deterministic checks require no network or credentials.
 
+## Verification
+
+From the repository root:
+
+```sh
+mix format --check-formatted
+mix compile --warnings-as-errors
+mix test --seed 0
+```
+
+Tests cover exact pacing against an independent rational oracle, immutable
+snapshots, validation and failure preservation, follower windows/outliers/steps,
+synthetic-clock scenarios and pinned public-Go fixtures. See
+[corpus documentation](docs/corpus.md) for provenance and numerical tolerances.
+Finite fixtures do not establish universal parity, real-device behavior or
+portable performance. Historical results are recorded in
+[Stage 3 verification](docs/stage3-verification.md).
+
+<!-- site:skip -->
 ## Deterministic verification contract
 
 Use ExUnit and builtin arithmetic; no added testing dependency. Stage 1
@@ -879,17 +896,13 @@ Original total $25 unchanged; caps owner-confirmed, not independently verified;
 spend/remaining unknown. Attempt/time limits do not enforce dollars. No preparation
 model calls, remotes, installs, publication or later kits. Runtime matrix/release
 and adapters remain deferred until separately reviewed.
+<!-- /site:skip -->
 
-## Throughput benchmark (approved bounded tool; implemented by the single authorized loop)
+## Throughput benchmark
 
 This dependency-free developer harness measures this Elixir implementation, not
 Go speed or real-time scheduling. It is separate from the pure runtime library.
-The approved outcome is a local harness only: no library API/algorithm changes,
-installs, dependencies, network, secrets, global VM tuning or concurrency product.
-CLI spelling, bounded defaults and report definitions below are local design
-choices within that approval. Wider benchmarking/publication remains deferred.
-
-Public commands (implemented in BENCH-1; local evidence is limited to the runs described below):
+The harness uses the public library API and runs bounded workloads.
 
 ```sh
 mix run scripts/throughput.exs --smoke
@@ -909,8 +922,8 @@ items). These bound work, not elapsed wallclock on arbitrary hardware.
 Each workload warms up once, then prepares a fresh independent state outside each
 sample's timer, and **chains every next immutable state within that sample**.
 Workloads/samples run sequentially, no sleeping or live observation timestamps.
-All library input clocks are deterministic integer counters. No library source,
-API, algorithm, private fields or external implementation may be used/changed.
+All library input clocks are deterministic integer counters. The harness uses only public library calls, not private fields or an external
+implementation.
 
 | Workload | One logical op; units per op |
 | --- | --- |
@@ -938,7 +951,7 @@ repeatedly use initial states. Checksums/counts are emitted, never dead sinks.
 
 Header labels: schema name `pll-throughput-v1`, Elixir/OTP, system architecture,
 online schedulers, config and **library_revision**, pinned to the protected
-Stage 3 baseline `03a99baca1db2872f6e6f9298914aab9e2242a2a`. This identifies
+library baseline `03a99baca1db2872f6e6f9298914aab9e2242a2a`. This identifies
 library code, NOT the benchmark implementation's checkout SHA/dirty status; record
 `git rev-parse HEAD` separately when comparing local runs. No environment dump.
 One stdout map per sample includes workload/sample, calls, units, statuses,
@@ -970,6 +983,7 @@ write ignored build caches/start VM processes as usual. The harness itself does
 not write results, spawn workload processes, read environment/secrets, contact
 network, sleep or tune VM globals. No permanent results/artifact format is added.
 
+<!-- site:skip -->
 ### Benchmark kit operation — loop completed once; not authorized again
 
 Prepared directly on `kit/throughput-benchmark` over actual clean Stage 3 HEAD
@@ -1037,20 +1051,18 @@ escalation; no substitutions, extra calls or fanout. Original aggregate $25
 budget is not expanded; provider caps owner-confirmed, not independently verified;
 spend/remaining unknown. Attempt/time limits do not enforce dollars. Contract gaps
 block the run for review; progress notes do not stop retries automatically.
+<!-- /site:skip -->
 
-## Local real-time pacing demonstration — approved scope A
+## Local real-time pacing demonstration
 
-**Approved contract; kit contains an unfinished runner, not a completed tool.** A developer runs a bounded
-local demonstration of the actual Elixir pacer driving discard or local UDP,
-then compares the same workload with Go on the same machine. This is different
-from the existing throughput microbenchmark. It does not change the library,
-its no-I/O contract, the corpus, tests, runner or historical logs. The initial
-port's CLI exclusion is narrowed only for this isolated tool. Scope A, its exact
-effects/bounds and local comparative trials below are approved. Kit preparation
-and verified kit commit are complete; parent launch review passed. The coder loop
-and bounded live trials are authorized as stated in Pacing kit operation. Original aggregate $25 budget unchanged; spend/remaining unknown,
-provider caps owner-confirmed, not independently verified.
+This checkout-only tool drives discard or local UDP with the Elixir pacer.
+It is separate from the pure library and the throughput microbenchmark.
+It supports pacer mode only: no ticker, rate search, remote destinations or
+arbitrary payloads. Writer acceptance does not measure receipt or loss.
+Historical same-machine results and their limits are recorded in
+[pacing verification](docs/pacing-verification.md).
 
+<!-- site:skip -->
 ### Source basis and parity boundary
 
 Inspected sibling Go HEAD `971282632129110794c9d6edd22026e9de2359be`, clean,
@@ -1114,23 +1126,20 @@ timers; none establishes receiver loss/jitter or a sustained real UDP bitrate.
   dropped-tick semantics, trial/rate/aggregate-wall caps and fair comparisons
   must be approved before a kit. Full external-target flag parity is not offered
   by either choice. Remote UDP and arbitrary payloads require specific approval.
+<!-- /site:skip -->
 
-### Approved finished-tool command and effects (scope A)
+### Commands and effects
 
-Examples are promises for a future tool, **not executable instructions now**:
+Run from the repository root:
 
 ```sh
 mix run scripts/pacing.exs
 mix run scripts/pacing.exs --bps 19392658 --unit-bytes 188 --seconds 5
 mix run scripts/pacing.exs --bps 19392658 --unit-bytes 188 --seconds 5 --udp loopback --per-datagram 1
 mix run scripts/pacing.exs --bps 19392658 --unit-bytes 188 --seconds 5 --udp loopback --per-datagram 7
-# Future same-machine Go counterparts (sibling remains read-only; caches outside it):
-(cd ../pll && GOPROXY=off GOTOOLCHAIN=local go run ./cmd/pllpace -bps 19392658 -unit-bytes 188 -seconds 5)
-(cd ../pll && GOPROXY=off GOTOOLCHAIN=local go run ./cmd/pllpace -bps 19392658 -unit-bytes 188 -seconds 5 -udp loopback -per-datagram 1)
-(cd ../pll && GOPROXY=off GOTOOLCHAIN=local go run ./cmd/pllpace -bps 19392658 -unit-bytes 188 -seconds 5 -udp loopback -per-datagram 7)
 ```
 
-Approved defaults: 19,392,658 bps, 188 bytes, 5 seconds, discard, grouping 1,
+Defaults: 19,392,658 bps, 188 bytes, 5 seconds, discard, grouping 1,
 pacer only. This is approximately ATSC payload rate: 12,894.0545 units/s,
 77.5551 microseconds/unit. Zero-filled bytes are timing payload, not valid MPEG-TS.
 No flags means **no network**. Only literal `--udp loopback` enables IPv4
@@ -1151,12 +1160,11 @@ cap exhaustion is an incomplete failed trial, not a sustained result. Due cap
 Tool-only effects: clocks, cancellable timed waits, bounded coordinator/worker
 and loopback receiver processes, local sockets, runtime metadata and stdout/stderr;
 Mix build caches as usual. No installs, dependencies, subprocess comparison runner,
-VM-global tuning, secrets, persistent results or external actions. Go commands are
-manual comparison, not something the Elixir tool launches. Report revision/dirty
+VM-global tuning, secrets, persistent results or external actions. The tool does not launch Go comparisons. Report revision/dirty
 state separately using operator Git commands, plus runtime/platform/schedulers
 and all effective options with each comparison. No environment dump.
 
-### Approved structure, timing and failures
+### Timing and failures
 
 Isolated `scripts/pacing.exs` entrypoint and `scripts/pacing/` helpers, using only
 public `PLL.Rate`, `PLL.Pacer`, `PLL.Span`; no private fields/algorithm changes.
@@ -1203,6 +1211,7 @@ no start-slot subtraction or forced unit-count equality across runtimes. Backlog
 is cursor lag, not queue depth. Lateness is oldest scheduled unit at call entry,
 not each unit's send time, network/receiver jitter or a bound on every unit.
 
+<!-- site:skip -->
 ### Approved verification and comparative acceptance
 
 Before a kit: independently verify fake-clock tests for immutable chaining,
@@ -1294,3 +1303,4 @@ $25 aggregate unchanged; caps owner-confirmed, unverified; spend/remaining unkno
 Attempt/time caps are not dollar enforcement. After the loop passes its judge and final
 checks, run only the bounded live trials recorded in [pacing verification](docs/pacing-verification.md#launch-gate-parent-review-passed-authorized-loop-and-bounded-trials);
 never chain another kit, loop or model call.
+<!-- /site:skip -->
